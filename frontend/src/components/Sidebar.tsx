@@ -1,14 +1,23 @@
-import { Users } from 'lucide-react'
+import { Users, ChevronsRight } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useChatStore } from '../store/chatStore';
 import { useAuthStore } from '../store/useAuthStore';
 import { SidebarSkeleton } from './Skeleton/SidebarSkeleton ';
 
-export const Sidebar = () => {
+
+type AsideProps = {
+    showUserInfo?: boolean
+    onToggle?: (val: boolean) => void
+}
+
+export const Sidebar = ({ showUserInfo, onToggle }: AsideProps) => {
     const { getUsers, users, selectedUser, setSelectedUser, isUsersLoading } = useChatStore();
 
     const { onlineUsers } = useAuthStore();
     const [showOnlineOnly, setShowOnlineOnly] = useState(false);
+    // const [showUserInfo, setShowUserInfo] = useState(false)
+
+
 
     const filteredUsers = showOnlineOnly
         ? users.filter((user) => onlineUsers.includes(user._id))
@@ -21,14 +30,30 @@ export const Sidebar = () => {
     if (isUsersLoading) return <SidebarSkeleton />;
 
     return (
-        <aside className="h-full w-20 lg:w-72 border-r border-base-300 flex flex-col transition-all duration-200">
+        <aside
+            className={`h-full border-r border-base-300 flex flex-col transition-all duration-200 ${showUserInfo ? "w-72" : "w-20"
+                } lg:w-72`}
+        >
             <div className="border-b border-base-300 w-full p-5">
-                <div className="flex items-center gap-2">
-                    <Users className="size-6" />
-                    <span className="font-medium hidden lg:block">Contacts</span>
+                <div className="flex gap-1">
+                    <div className="flex items-center gap-2">
+                        <Users className="size-6" />
+                        <span className={`font-medium ${showUserInfo ? "block" : "hidden"} lg:block`}>Contacts</span>
+                    </div>
+
+                    <button
+                        className="lg:hidden"
+                        onClick={() => onToggle?.(!showUserInfo)}
+                        aria-expanded={showUserInfo}
+                        aria-label={showUserInfo ? "Collapse sidebar" : "Expand sidebar"}
+                    >
+                        <ChevronsRight
+                            className={`text-gray-600 hover:text-gray-400 transition-transform ${showUserInfo ? "rotate-180" : ""}`}
+                        />
+                    </button>
                 </div>
-                {/* TODO: Online filter toggle */}
-                <div className="mt-3 hidden lg:flex items-center gap-2">
+
+                <div className={`mt-3 items-center gap-2 ${showUserInfo ? "flex" : "hidden"} lg:flex`}>
                     <label className="cursor-pointer flex items-center gap-2">
                         <input
                             type="checkbox"
@@ -38,7 +63,9 @@ export const Sidebar = () => {
                         />
                         <span className="text-sm">Show online only</span>
                     </label>
-                    <span className="text-xs text-zinc-500">({onlineUsers.length - 1 === -1 ? 0 : onlineUsers.length - 1} online)</span>
+                    <span className="text-xs text-zinc-500">
+                        ({onlineUsers.length - 1 === -1 ? 0 : onlineUsers.length - 1} online)
+                    </span>
                 </div>
             </div>
 
@@ -46,41 +73,34 @@ export const Sidebar = () => {
                 {filteredUsers.map((user) => (
                     <button
                         key={user._id}
-                        onClick={() => setSelectedUser(user)}
+                        onClick={() => {setSelectedUser(user); onToggle?.(false)}}
                         className={`
               w-full p-3 flex items-center gap-3
               hover:bg-base-300 transition-colors
               ${selectedUser?._id === user._id ? "bg-base-300 ring-1 ring-base-300" : ""}
             `}
                     >
-                        <div className="relative mx-auto lg:mx-0">
+                        <div className={`relative ${showUserInfo ? "mx-0" : "mx-auto"} lg:mx-0`}>
                             <img
                                 src={user.profile || "/avatar.png"}
                                 alt={user.fullName}
                                 className="size-12 object-cover rounded-full"
                             />
                             {onlineUsers.includes(user._id) && (
-                                <span
-                                    className="absolute bottom-0 right-0 size-3 bg-green-500 
-                  rounded-full ring-2 ring-zinc-900"
-                                />
+                                <span className="absolute bottom-0 right-0 size-3 bg-green-500 rounded-full ring-2 ring-zinc-900" />
                             )}
                         </div>
 
-                        {/* User info - only visible on larger screens */}
-                        <div className="hidden lg:block text-left min-w-0">
+                        <div className={`${showUserInfo ? "block" : "hidden"} lg:block text-left min-w-0`}>
                             <div className="font-medium truncate">{user.userName}</div>
-                            <div className="text-sm text-zinc-400">
-                                {onlineUsers.includes(user._id) ? "Online" : "Offline"}
-                            </div>
+                            <div className="text-sm text-zinc-400">{onlineUsers.includes(user._id) ? "Online" : "Offline"}</div>
                         </div>
                     </button>
                 ))}
 
-                {filteredUsers.length === 0 && (
-                    <div className="text-center text-zinc-500 py-4">No online users</div>
-                )}
+                {filteredUsers.length === 0 && <div className="text-center text-zinc-500 py-4">No online users</div>}
             </div>
         </aside>
+
     )
 }
