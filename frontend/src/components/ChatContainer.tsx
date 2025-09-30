@@ -5,6 +5,7 @@ import { useChatStore } from '../store/chatStore';
 import { MessageSkeleton } from './Skeleton/MessageSkeleton';
 import { useAuthStore } from '../store/useAuthStore';
 import { formateTime } from '../utility/formateTime';
+import { AudioPlayer } from './AudioPlayerProps';
 
 export const ChatContainer = () => {
 
@@ -76,6 +77,8 @@ export const ChatContainer = () => {
                 />
               )}
               {message.text && <p>{message.text}</p>}
+              {message.audio && <AudioPlayer src={message.audio}  />}
+
             </div>
           </div>
         ))}

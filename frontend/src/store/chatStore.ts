@@ -6,7 +6,7 @@ import { useAuthStore } from "./useAuthStore";
 import type { IMessage } from "../types/message";
 
 
-export const useChatStore = create<ChatStore>((set,get) => ({
+export const useChatStore = create<ChatStore>((set, get) => ({
     messages: [],
     users: [],
     selectedUser: null,
@@ -16,56 +16,69 @@ export const useChatStore = create<ChatStore>((set,get) => ({
 
 
     getUsers: async () => {
-        set({isUsersLoading: true})
+        set({ isUsersLoading: true })
         try {
             const res = await axiosInstance.get('/messages/users')
-            set({users: res.data})
+            set({ users: res.data })
         } catch (error) {
             errorHandler(error)
         } finally {
-            set({isUsersLoading: false})
+            set({ isUsersLoading: false })
         }
     },
 
     getMessages: async (userId: string) => {
-        set({isMessagesLoading: true})
+        set({ isMessagesLoading: true })
         try {
             const res = await axiosInstance.get(`/messages/${userId}`)
             console.log(res.data)
-            set({messages: res.data})
+            set({ messages: res.data })
 
         } catch (error) {
             errorHandler(error)
         } finally {
-            set({isMessagesLoading: false})
+            set({ isMessagesLoading: false })
         }
     },
 
     sendMessage: async (messageData: FormData) => {
-        set({isSendMessageLoading: true})
-        const {messages, selectedUser} = get()
+        set({ isSendMessageLoading: true })
+        const { messages, selectedUser } = get()
         try {
-            const res = await axiosInstance.post(`/messages/send/${selectedUser?._id}`,messageData)
-            console.log(res.data)
-            set({messages: [...messages, res.data]})
+            const res = await axiosInstance.post(`/messages/send/${selectedUser?._id}`, messageData)
+            set({ messages: [...messages, res.data] })
         } catch (error) {
             errorHandler(error)
         } finally {
-            set({isSendMessageLoading: false})
+            set({ isSendMessageLoading: false })
+        }
+    },
+
+    sendVoiceMessage: async (audio: FormData) => {
+        set({ isSendMessageLoading: true })
+        const { messages, selectedUser } = get()
+        try {
+            console.log(messages, selectedUser, audio)
+            const res = await axiosInstance.post(`/messages/send-voice/${selectedUser?._id}`, audio)
+            set({ messages: [...messages, res.data] })
+        } catch (error) {
+            errorHandler(error)
+        } finally {
+            set({ isSendMessageLoading: false })
         }
     },
 
     subscribeToMessages: () => {
-        const {selectedUser} = get()
-        if(!selectedUser) return
+        const { selectedUser } = get()
+        if (!selectedUser) return
 
         const socket = useAuthStore.getState().socket
 
         socket?.on('newMessages', (newMessage: IMessage) => {
             const isMessageSendFromSelectedUser = newMessage.senderId === selectedUser._id
-            if(!isMessageSendFromSelectedUser)return 
+            if (!isMessageSendFromSelectedUser) return
 
-            set({messages: [...get().messages, newMessage]})
+            set({ messages: [...get().messages, newMessage] })
             console.log('message :', get().messages)
         })
     },

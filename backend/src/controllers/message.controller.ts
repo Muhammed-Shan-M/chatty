@@ -58,7 +58,8 @@ export const sendMessage = async (req: Request, res: Response, next: NextFunctio
             senderId,
             reciverId,
             text,
-            image: imageUrl
+            image: imageUrl,
+            type: 'normal'
         })
 
         await newMessage.save()
@@ -79,6 +80,7 @@ export const sendMessage = async (req: Request, res: Response, next: NextFunctio
 export const sendVoiceMessage = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const audio = req.file
+        console.log(audio)
 
         const reciverId = req.params.id
         const senderId = req.user?._id
@@ -93,7 +95,8 @@ export const sendVoiceMessage = async (req: Request, res: Response, next: NextFu
         const newMessage = new Message({
             senderId,
             reciverId,
-            audio
+            type:'voice',
+            audio:audioUrl
         })
 
         await newMessage.save()
@@ -102,6 +105,7 @@ export const sendVoiceMessage = async (req: Request, res: Response, next: NextFu
         if (reciverSocketId) {
             io.to(reciverSocketId).emit('newMessages', newMessage)
         }
+        console.log(newMessage)
 
         res.status(201).json(newMessage)
     } catch (error) {

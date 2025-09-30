@@ -2,7 +2,8 @@ export interface Message {
     senderId: string
     reciverId: string
     text?: string,
-    image?:string
+    image?:string,
+    audio?:string
 } 
 
 
