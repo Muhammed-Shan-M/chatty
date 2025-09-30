@@ -46,12 +46,12 @@ export const sendMessage = async (req: Request, res: Response, next: NextFunctio
 
         const reciverId = req.params.id
         const senderId = req.user?._id
-        
+
         if (!text && !image) throw new AppError("Please provide a message text or an image.", 400)
 
         let imageUrl = ''
-        if(image){
-            imageUrl = await uploadToCloudinary(req)
+        if (image) {
+            imageUrl = await uploadToCloudinary(image, false)
         }
 
         const newMessage = new Message({
@@ -65,11 +65,45 @@ export const sendMessage = async (req: Request, res: Response, next: NextFunctio
 
 
         const reciverSocketId = getReciverSocketId(reciverId!)
-        if(reciverSocketId){
-            io.to(reciverSocketId).emit('newMessages',newMessage)
+        if (reciverSocketId) {
+            io.to(reciverSocketId).emit('newMessages', newMessage)
         }
 
-        res.status(201).json( newMessage )
+        res.status(201).json(newMessage)
+    } catch (error) {
+        next(error)
+    }
+}
+
+
+export const sendVoiceMessage = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const audio = req.file
+
+        const reciverId = req.params.id
+        const senderId = req.user?._id
+
+        let audioUrl
+        if (audio) {
+            audioUrl = await uploadToCloudinary(audio, true)
+        } else {
+            throw new AppError('No audio file uploaded. Please provide an audio file.', 400)
+        }
+
+        const newMessage = new Message({
+            senderId,
+            reciverId,
+            audio
+        })
+
+        await newMessage.save()
+
+        const reciverSocketId = getReciverSocketId(reciverId!)
+        if (reciverSocketId) {
+            io.to(reciverSocketId).emit('newMessages', newMessage)
+        }
+
+        res.status(201).json(newMessage)
     } catch (error) {
         next(error)
     }

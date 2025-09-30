@@ -8,7 +8,9 @@ const messageSchema = new mongoose.Schema<IMessage>(
         senderId:{type: Schema.Types.ObjectId, ref: "User", required: true},
         reciverId:{type: Schema.Types.ObjectId, ref: "User", required: true},
         text: {type: String},
-        image: {type: String}
+        image: {type: String},
+        audio: {type: String},
+        type: {type: String, enum:['voice','normal'], default:'normal'}
     },
     {timestamps: true}
 )

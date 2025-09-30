@@ -4,7 +4,9 @@ export interface Message {
     senderId: Types.ObjectId
     reciverId: Types.ObjectId
     text?: string,
-    image?:string
+    image?:string,
+    audio?:string,
+    type?: 'voice' | 'normal'
 } 
 
 
