@@ -73,7 +73,7 @@ export function AudioPlayer({ src, className = "" }: AudioPlayerProps) {
         <div
             className={`inline-flex items-center gap-2 bg-primary text-primary-content rounded-full px-3 py-2 ${className}`}
             style={{
-                width: "clamp(40px, 30vw, 250px)", // width will shrink from 250px to 150px based on screen size
+                width: "clamp(40px, 30vw, 250px)", 
             }}
         >
             <button

@@ -4,6 +4,8 @@ import Message from "../models/message.model.ts"
 import { AppError } from "../errors/appError.errors.ts"
 import { uploadToCloudinary } from "../utility/cloudinaryuploader.utility.ts"
 import { getReciverSocketId, io } from "../lib/socket.ts"
+import { timeStamp } from "console"
+import { buildPreview } from "../utility/buidePreview.ts"
 
 export const fetchAllUserForSideBar = async (req: Request, res: Response) => {
     try {
@@ -63,8 +65,16 @@ export const sendMessage = async (req: Request, res: Response, next: NextFunctio
 
 
         const reciverSocketId = getReciverSocketId(reciverId!)
+
         if (reciverSocketId) {
             io.to(reciverSocketId).emit('newMessages', newMessage)
+            io.to(reciverSocketId).emit('notifyUser', {
+                messageId : newMessage._id,
+                senderId: newMessage.senderId,
+                timeStamp: newMessage.createdAt,
+                senderUserName: req.user?.userName,
+                preview: buildPreview(newMessage)
+            })
         }
 
         res.status(201).json(newMessage)
@@ -100,8 +110,15 @@ export const sendVoiceMessage = async (req: Request, res: Response, next: NextFu
         const reciverSocketId = getReciverSocketId(reciverId!)
         if (reciverSocketId) {
             io.to(reciverSocketId).emit('newMessages', newMessage)
+            io.to(reciverSocketId).emit('notifyUser', {
+                messageId : newMessage._id,
+                senderId: newMessage.senderId,
+                timeStamp: newMessage.createdAt,
+                senderUserName: req.user?.userName,
+                preview: buildPreview(newMessage)
+            })
         }
-        console.log(newMessage)
+
 
         res.status(201).json(newMessage)
     } catch (error) {

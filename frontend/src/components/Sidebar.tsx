@@ -12,11 +12,9 @@ type AsideProps = {
 
 export const Sidebar = ({ showUserInfo, onToggle }: AsideProps) => {
     const { getUsers, users, selectedUser, setSelectedUser, isUsersLoading } = useChatStore();
-
     const { onlineUsers } = useAuthStore();
-    const [showOnlineOnly, setShowOnlineOnly] = useState(false);
-    // const [showUserInfo, setShowUserInfo] = useState(false)
 
+    const [showOnlineOnly, setShowOnlineOnly] = useState(false);
 
 
     const filteredUsers = showOnlineOnly

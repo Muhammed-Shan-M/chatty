@@ -6,10 +6,12 @@ import { toast } from 'react-toastify'
 import { errorHandler } from '../utility/errorHandler'
 import type { LoginFormData } from '../types/loginFormData'
 import { io } from 'socket.io-client'
+import { emitNotification } from '../utility/emitNotification'
+import { useChatStore } from './chatStore'
 
 const BASE_URL = import.meta.env.VITE_API_SOCKET_URL
 
-export const useAuthStore = create<AuthStateType>((set,get) => ({
+export const useAuthStore = create<AuthStateType>((set, get) => ({
     authUser: null,
     isSigninUP: false,
     isLoggingIng: false,
@@ -77,58 +79,72 @@ export const useAuthStore = create<AuthStateType>((set,get) => ({
 
 
     updateProfile: async (data) => {
-        set({isUpdatingProfile: true})
+        set({ isUpdatingProfile: true })
         try {
             const res = await axiosInstance.put('/auth/update-profile-picture', data)
-            if(res){
-                set({authUser: res.data})
+            if (res) {
+                set({ authUser: res.data })
                 toast.success('Profile image updated! Your new picture is now visible.')
             }
         } catch (error) {
             errorHandler(error)
         } finally {
-            set({isUpdatingProfile: false})
+            set({ isUpdatingProfile: false })
         }
     },
 
 
-    updateFullName: async (data:{fullName: string}) => {
-        set({updatingFullName: true})
+    updateFullName: async (data: { fullName: string }) => {
+        set({ updatingFullName: true })
         try {
             const res = await axiosInstance.put('/auth/update-fullname', data)
-            if(res){
-                set({authUser: res.data})
+            if (res) {
+                set({ authUser: res.data })
                 toast.success('Profile updated! Your name change is now saved."')
             }
         } catch (error) {
             errorHandler(error)
         } finally {
-            set({updatingFullName: false})
+            set({ updatingFullName: false })
         }
     },
 
     connectSocket: async () => {
-        const {authUser} = get()
-        if(!authUser && get().socket?.connected) return 
+        const { authUser } = get()
+        if (!authUser && get().socket?.connected) return
 
         const socket = io(BASE_URL, {
-            query:{
+            query: {
                 userId: authUser?._id
             }
         })
 
         socket.connect()
 
-        set({socket: socket})
+        set({ socket: socket })
+
+        if ("Notification" in window) {
+            if (Notification.permission === "default") {
+                Notification.requestPermission().then(permission => {
+                    console.log("Notification permission:", permission);
+                });
+            }
+        }
 
         socket.on('getOnlineUsers', (userIds) => {
-            set({onlineUsers: userIds})
+            set({ onlineUsers: userIds })
+        })
+
+
+        socket.on('notifyUser', (notification) => {
+            const selectedUser = useChatStore.getState().selectedUser
+            emitNotification(notification,selectedUser)
         })
 
     },
 
     disconnectSocket: async () => {
-        if(get().socket?.connect())get().socket?.disconnect()
+        if (get().socket?.connect()) get().socket?.disconnect()
     }
-    
+
 }))
