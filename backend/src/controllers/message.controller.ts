@@ -54,11 +54,16 @@ export const sendMessage = async (req: Request, res: Response, next: NextFunctio
             imageUrl = await uploadToCloudinary(image, false)
         }
 
+        const preview = buildPreview({text, image:imageUrl})
+        const chatId = [senderId?.toString(), reciverId?.toString()].sort().join('_')
+
         const newMessage = new Message({
             senderId,
             reciverId,
             text,
             image: imageUrl,
+            chatId,
+            preview,
         })
 
         await newMessage.save()
@@ -73,7 +78,7 @@ export const sendMessage = async (req: Request, res: Response, next: NextFunctio
                 senderId: newMessage.senderId,
                 timeStamp: newMessage.createdAt,
                 senderUserName: req.user?.userName,
-                preview: buildPreview(newMessage)
+                preview: newMessage.preview
             })
         }
 
@@ -99,10 +104,15 @@ export const sendVoiceMessage = async (req: Request, res: Response, next: NextFu
             throw new AppError('No audio file uploaded. Please provide an audio file.', 400)
         }
 
+        const preview = buildPreview({audio: audioUrl})
+        const chatId = [senderId?.toString(), reciverId?.toString()].sort().join('_')
+
         const newMessage = new Message({
             senderId,
             reciverId,
-            audio:audioUrl
+            audio:audioUrl,
+            chatId,
+            preview
         })
 
         await newMessage.save()
@@ -115,12 +125,43 @@ export const sendVoiceMessage = async (req: Request, res: Response, next: NextFu
                 senderId: newMessage.senderId,
                 timeStamp: newMessage.createdAt,
                 senderUserName: req.user?.userName,
-                preview: buildPreview(newMessage)
+                preview: newMessage.preview
             })
         }
 
 
         res.status(201).json(newMessage)
+    } catch (error) {
+        next(error)
+    }
+}
+
+
+
+export const getUnreadMessages = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const userId = req.params.id
+
+        const converstaions = await Message.aggregate([
+            {$match:{$or:[{senderId: userId}, {reciverId : userId}]}},
+            {
+                $group: {
+                    _id: '$chatId',
+                    lastMessage: {$last: '$preview'},
+                    lastCreatedAt: {$last: '$createdAt'},
+                    unreadCount: {
+                        $sum: {
+                            $cond: [
+                                {$and: [{$eq:['$reciverId', userId]}, {$eq:['$isRead',false]}]}, 1, 0
+                            ]
+                        }
+                    },
+                    participants: {$first: ["$senderId", "$receiverId"]}
+                }
+            }
+        ])
+
+        res.status(200).json(converstaions)
     } catch (error) {
         next(error)
     }

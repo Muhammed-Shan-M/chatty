@@ -6,7 +6,9 @@ export interface Message {
     text?: string,
     image?:string,
     audio?:string,
-    isRead: boolean
+    isRead: boolean,
+    chatId: string,
+    preview: string
 } 
 
 

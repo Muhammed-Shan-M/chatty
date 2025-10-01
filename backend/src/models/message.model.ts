@@ -10,7 +10,9 @@ const messageSchema = new mongoose.Schema<IMessage>(
         text: {type: String},
         image: {type: String},
         audio: {type: String},
-        isRead: {type: Boolean, default:false}
+        isRead: {type: Boolean, default:false},
+        chatId: {type: String, required: true},
+        preview: { type: String, required: true }
     },
     {timestamps: true}
 )
