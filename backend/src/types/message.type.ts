@@ -6,7 +6,7 @@ export interface Message {
     text?: string,
     image?:string,
     audio?:string,
-    type?: 'voice' | 'normal'
+    isRead: boolean
 } 
 
 

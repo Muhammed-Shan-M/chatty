@@ -100,7 +100,7 @@ export const updateProfilePicture = async (req: Request, res: Response, next: Ne
 
         const userId = req.user?._id
 
-        const cloudinaryImage = await uploadToCloudinary(req)
+        const cloudinaryImage = await uploadToCloudinary(req.file,false)
 
         const updateUser = await User.findByIdAndUpdate(userId,
             {

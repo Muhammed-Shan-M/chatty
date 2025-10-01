@@ -2,10 +2,8 @@ import type { NextFunction, Request, Response } from "express"
 import User from "../models/user.model.ts"
 import Message from "../models/message.model.ts"
 import { AppError } from "../errors/appError.errors.ts"
-import cloudinary from "../lib/cloudinary.ts"
 import { uploadToCloudinary } from "../utility/cloudinaryuploader.utility.ts"
 import { getReciverSocketId, io } from "../lib/socket.ts"
-import { Socket } from "socket.io"
 
 export const fetchAllUserForSideBar = async (req: Request, res: Response) => {
     try {
@@ -59,7 +57,6 @@ export const sendMessage = async (req: Request, res: Response, next: NextFunctio
             reciverId,
             text,
             image: imageUrl,
-            type: 'normal'
         })
 
         await newMessage.save()
@@ -95,7 +92,6 @@ export const sendVoiceMessage = async (req: Request, res: Response, next: NextFu
         const newMessage = new Message({
             senderId,
             reciverId,
-            type:'voice',
             audio:audioUrl
         })
 

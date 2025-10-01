@@ -10,7 +10,7 @@ const messageSchema = new mongoose.Schema<IMessage>(
         text: {type: String},
         image: {type: String},
         audio: {type: String},
-        type: {type: String, enum:['voice','normal'], default:'normal'}
+        isRead: {type: Boolean, default:false}
     },
     {timestamps: true}
 )
