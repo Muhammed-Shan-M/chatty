@@ -1,10 +1,7 @@
 import { useChatStore } from '../store/chatStore'
-
-
 import { NoChatSelected } from '../components/NoChatSelected'
 import { ChatContainer } from '../components/ChatContainer'
 import { Sidebar } from '../components/Sidebar'
-import { useState } from 'react'
 import { ChatLoadingSkeleton } from '../components/Skeleton/chatLoadingSkeleton'
 import { useAuthStore } from '../store/useAuthStore'
 

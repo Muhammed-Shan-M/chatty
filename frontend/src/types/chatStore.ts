@@ -1,4 +1,3 @@
-import type { promises } from "dns";
 import type { IMessage } from "./message";
 import type { UnreadMessages } from "./unreadMessages";
 import type { User } from "./user";
