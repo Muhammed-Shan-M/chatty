@@ -5,4 +5,5 @@ export interface User extends FormData{
     createdAt: string,
     updatedAt: string,
     profile: string
+    chatId: string
 }

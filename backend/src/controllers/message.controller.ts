@@ -4,15 +4,18 @@ import Message from "../models/message.model.ts"
 import { AppError } from "../errors/appError.errors.ts"
 import { uploadToCloudinary } from "../utility/cloudinaryuploader.utility.ts"
 import { getReciverSocketId, io } from "../lib/socket.ts"
-import { timeStamp } from "console"
 import { buildPreview } from "../utility/buidePreview.ts"
+import mongoose from "mongoose"
+import { findChatId } from "../utility/findChatId.ts"
 
 export const fetchAllUserForSideBar = async (req: Request, res: Response) => {
     try {
         const loggedInUserId = req.user?._id
         const filteredUsers = await User.find({ _id: { $ne: loggedInUserId } }).select('-password')
 
-        res.status(200).json(filteredUsers)
+        const usersWithChatId = filteredUsers.map((item) => ({ ...item.toObject(), chatId: findChatId(loggedInUserId?.toString()!, item._id.toString()!) }))
+        console.log('all users : ', usersWithChatId)
+        res.status(200).json(usersWithChatId)
 
     } catch (error) {
         res.status(500).json({ message: "Internal server error" })
@@ -54,8 +57,8 @@ export const sendMessage = async (req: Request, res: Response, next: NextFunctio
             imageUrl = await uploadToCloudinary(image, false)
         }
 
-        const preview = buildPreview({text, image:imageUrl})
-        const chatId = [senderId?.toString(), reciverId?.toString()].sort().join('_')
+        const preview = buildPreview({ text, image: imageUrl })
+        const chatId = findChatId(senderId?.toString()!, reciverId?.toString()!)
 
         const newMessage = new Message({
             senderId,
@@ -74,7 +77,7 @@ export const sendMessage = async (req: Request, res: Response, next: NextFunctio
         if (reciverSocketId) {
             io.to(reciverSocketId).emit('newMessages', newMessage)
             io.to(reciverSocketId).emit('notifyUser', {
-                messageId : newMessage._id,
+                messageId: newMessage._id,
                 senderId: newMessage.senderId,
                 timeStamp: newMessage.createdAt,
                 senderUserName: req.user?.userName,
@@ -104,13 +107,13 @@ export const sendVoiceMessage = async (req: Request, res: Response, next: NextFu
             throw new AppError('No audio file uploaded. Please provide an audio file.', 400)
         }
 
-        const preview = buildPreview({audio: audioUrl})
-        const chatId = [senderId?.toString(), reciverId?.toString()].sort().join('_')
+        const preview = buildPreview({ audio: audioUrl })
+        const chatId = findChatId(senderId?.toString()!, reciverId?.toString()!)
 
         const newMessage = new Message({
             senderId,
             reciverId,
-            audio:audioUrl,
+            audio: audioUrl,
             chatId,
             preview
         })
@@ -121,7 +124,7 @@ export const sendVoiceMessage = async (req: Request, res: Response, next: NextFu
         if (reciverSocketId) {
             io.to(reciverSocketId).emit('newMessages', newMessage)
             io.to(reciverSocketId).emit('notifyUser', {
-                messageId : newMessage._id,
+                messageId: newMessage._id,
                 senderId: newMessage.senderId,
                 timeStamp: newMessage.createdAt,
                 senderUserName: req.user?.userName,
@@ -140,28 +143,39 @@ export const sendVoiceMessage = async (req: Request, res: Response, next: NextFu
 
 export const getUnreadMessages = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const userId = req.params.id
+        const userId = new mongoose.Types.ObjectId(req.params.id)
+        console.log(userId)
 
         const converstaions = await Message.aggregate([
-            {$match:{$or:[{senderId: userId}, {reciverId : userId}]}},
+            { $match: {  reciverId: userId , isRead: false } },
             {
                 $group: {
                     _id: '$chatId',
-                    lastMessage: {$last: '$preview'},
-                    lastCreatedAt: {$last: '$createdAt'},
-                    unreadCount: {
-                        $sum: {
-                            $cond: [
-                                {$and: [{$eq:['$reciverId', userId]}, {$eq:['$isRead',false]}]}, 1, 0
-                            ]
-                        }
-                    },
-                    participants: {$first: ["$senderId", "$receiverId"]}
+                    lastMessage: { $last: '$preview' },
+                    lastCreatedAt: { $last: '$createdAt' },
+                    unreadCount: {$sum: 1}
                 }
             }
         ])
 
         res.status(200).json(converstaions)
+    } catch (error) {
+        next(error)
+    }
+}
+
+
+export const markAsRead = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const {userId, selectedUserId} = req.body
+
+        if (!userId || !selectedUserId) throw new AppError('Required user identifiers are missing.', 400)
+
+        const chatId = findChatId(userId?.toString(), selectedUserId?.toString())
+
+        await Message.updateMany({ chatId }, { $set: { isRead: true } })
+        
+        res.status(200).json({ success: true })
     } catch (error) {
         next(error)
     }

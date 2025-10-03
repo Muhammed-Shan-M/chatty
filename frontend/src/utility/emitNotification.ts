@@ -1,12 +1,9 @@
 import { toast } from "react-toastify";
 import MessageNotification from "../components/Notifications/messageNotification";
 import type { Notification } from "../types/Notification";
-import type { User } from "../types/user";
 
 
-export function emitNotification(notification: Notification, selectedUser: User | null) {
-
-    if(selectedUser && notification.senderId === selectedUser?._id)return 
+export function emitNotification(notification: Notification) {
 
     if ("Notification" in window && Notification.permission === "granted") {
         new Notification(`New message from ${notification.senderUserName || 'One User'}`, {

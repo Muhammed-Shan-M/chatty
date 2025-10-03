@@ -4,11 +4,14 @@ import { axiosInstance } from "../lib/axios";
 import { errorHandler } from "../utility/errorHandler";
 import { useAuthStore } from "./useAuthStore";
 import type { IMessage } from "../types/message";
+import { findChatId } from "../utility/findChatId";
+import { markAsRead } from "../utility/markAsRead";
 
 
 export const useChatStore = create<ChatStore>((set, get) => ({
     messages: [],
     users: [],
+    unreadMessages: [],
     selectedUser: null,
     isUsersLoading: false,
     isMessagesLoading: false,
@@ -88,5 +91,39 @@ export const useChatStore = create<ChatStore>((set, get) => ({
         socket?.off("newMessages")
     },
 
-    setSelectedUser: (selectedUser) => set({ selectedUser })
+    setSelectedUser: async (selectedUser) => {
+        set({ selectedUser })
+        const rollBack = [...get().unreadMessages]
+
+        try {
+            const userId = useAuthStore.getState().authUser?._id
+
+            if (!selectedUser?._id || !userId) throw new Error('Required user identifiers are missing.')
+            const chatId = findChatId(userId, selectedUser?._id)
+
+            set((state) => ({
+                unreadMessages: state.unreadMessages.some(item => item._id === chatId)
+                    ? state.unreadMessages.filter(item => item._id !== chatId)
+                    : state.unreadMessages
+            }));
+
+            const res = await markAsRead(userId,selectedUser._id)
+
+            if (!res.data.success) {
+                set({ unreadMessages: rollBack })
+            }
+
+        } catch (error) {
+            set({ unreadMessages: rollBack })
+        }
+    },
+
+    fetchUnreadMessages: async (userId) => {
+        try {
+            const res = await axiosInstance.get(`/messages/unread-messages/${userId}`)
+            set({ unreadMessages: res.data })
+        } catch (error) {
+            errorHandler(error)
+        }
+    }
 }))

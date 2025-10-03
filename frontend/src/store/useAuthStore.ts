@@ -8,6 +8,7 @@ import type { LoginFormData } from '../types/loginFormData'
 import { io } from 'socket.io-client'
 import { emitNotification } from '../utility/emitNotification'
 import { useChatStore } from './chatStore'
+import { markAsRead } from '../utility/markAsRead'
 
 const BASE_URL = import.meta.env.VITE_API_SOCKET_URL
 
@@ -136,10 +137,27 @@ export const useAuthStore = create<AuthStateType>((set, get) => ({
         })
 
 
-        socket.on('notifyUser', (notification) => {
-            const selectedUser = useChatStore.getState().selectedUser
-            emitNotification(notification,selectedUser)
-        })
+        socket.on('notifyUser', async (notification) => {
+            const { selectedUser, fetchUnreadMessages } = useChatStore.getState();
+
+            if (!authUser) return;
+
+
+            if (selectedUser?._id === notification.senderId) {
+                try {
+                    const res = await markAsRead(authUser._id, selectedUser?._id!);
+                    if (res.data.success) return;
+                } catch (err) {
+                    errorHandler(err)
+                }
+            }
+            else if (selectedUser?._id !== notification.senderId) {
+
+                emitNotification(notification);
+                fetchUnreadMessages(authUser._id);
+
+            }
+        });
 
     },
 

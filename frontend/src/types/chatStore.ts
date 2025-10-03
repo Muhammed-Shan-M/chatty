@@ -1,9 +1,12 @@
+import type { promises } from "dns";
 import type { IMessage } from "./message";
+import type { UnreadMessages } from "./unreadMessages";
 import type { User } from "./user";
 
 export interface ChatStore {
     messages: IMessage[],
     users: User[],
+    unreadMessages:UnreadMessages[] 
     selectedUser: User | null,
     isUsersLoading: boolean,
     isMessagesLoading: boolean,
@@ -15,4 +18,5 @@ export interface ChatStore {
     subscribeToMessages: () => void
     unsubscribeFromMessages: () => void
     setSelectedUser: (selecteduser: User | null) => void
+    fetchUnreadMessages: (userId: string) => Promise<void>
 }
