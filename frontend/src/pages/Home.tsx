@@ -10,7 +10,7 @@ import { useAuthStore } from '../store/useAuthStore'
 
 export const Home = () => {
   const { selectedUser } = useChatStore()
-  const {showUserInfo, setShowUserInfo} = useAuthStore()
+  const {showUserInfo} = useAuthStore()
 
 
   // TODO: need more improve on the design when the side bar open 
