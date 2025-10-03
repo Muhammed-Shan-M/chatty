@@ -12,6 +12,8 @@ export interface AuthStateType {
     updatingFullName: boolean,
     onlineUsers: string[]
     socket: Socket | null
+    showUserInfo: boolean
+    setShowUserInfo:(val: boolean) => void
     checkAuth: () => Promise<void>
     signup: (data: Data) => Promise<void>
     logout: () => Promise<void>

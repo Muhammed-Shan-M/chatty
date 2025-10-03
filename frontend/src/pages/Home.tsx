@@ -6,10 +6,11 @@ import { ChatContainer } from '../components/ChatContainer'
 import { Sidebar } from '../components/Sidebar'
 import { useState } from 'react'
 import { ChatLoadingSkeleton } from '../components/Skeleton/chatLoadingSkeleton'
+import { useAuthStore } from '../store/useAuthStore'
 
 export const Home = () => {
   const { selectedUser } = useChatStore()
-  const [showUserInfo, setShowUserInfo] = useState(false)
+  const {showUserInfo, setShowUserInfo} = useAuthStore()
 
 
   // TODO: need more improve on the design when the side bar open 
@@ -18,7 +19,7 @@ export const Home = () => {
       <div className="flex items-center justify-center pt-20 px-4">
         <div className="bg-base-100 rounded-lg shadow-cl w-full max-w-6xl h-[calc(100vh-8rem)]">
           <div className="flex h-full rounded-lg overflow-hidden">
-            <Sidebar showUserInfo={showUserInfo} onToggle={(val: boolean) => setShowUserInfo(() => val)} />
+            <Sidebar />
 
           
             {showUserInfo && <ChatLoadingSkeleton />}

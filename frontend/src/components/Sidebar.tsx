@@ -6,14 +6,10 @@ import { SidebarSkeleton } from './Skeleton/SidebarSkeleton ';
 import type { User } from '../types/user';
 
 
-type AsideProps = {
-    showUserInfo?: boolean
-    onToggle?: (val: boolean) => void
-}
 
-export const Sidebar = ({ showUserInfo, onToggle }: AsideProps) => {
+export const Sidebar = () => {
     const { unreadMessages, fetchUnreadMessages, getUsers, users, selectedUser, setSelectedUser, isUsersLoading } = useChatStore();
-    const { onlineUsers, authUser } = useAuthStore();
+    const { onlineUsers, authUser, showUserInfo, setShowUserInfo } = useAuthStore();
 
     const [showOnlineOnly, setShowOnlineOnly] = useState(false);
     const [sortedUsers, setSortedUsers] = useState<User[] | null>(null)
@@ -21,7 +17,14 @@ export const Sidebar = ({ showUserInfo, onToggle }: AsideProps) => {
 
     const filteredUsers = showOnlineOnly
         ? users.filter((user) => onlineUsers.includes(user._id))
-        : users;
+        : users.reduce((acc,user) => {
+            if(onlineUsers.includes(user._id)){
+                acc.unshift(user)
+            }else{
+                acc.push(user)
+            }
+            return acc
+        }, [] as User[])
 
 
     const unreadMap = Object.fromEntries(
@@ -48,7 +51,7 @@ export const Sidebar = ({ showUserInfo, onToggle }: AsideProps) => {
         if (authUser) {
             fetchUnreadMessages(authUser?._id)
         }
-    }, [authUser, fetchUnreadMessages])  
+    }, [authUser, fetchUnreadMessages])
 
 
     if (isUsersLoading) return <SidebarSkeleton />;
@@ -67,7 +70,7 @@ export const Sidebar = ({ showUserInfo, onToggle }: AsideProps) => {
 
                     <button
                         className="lg:hidden"
-                        onClick={() => onToggle?.(!showUserInfo)}
+                        onClick={() => setShowUserInfo(!showUserInfo)}
                         aria-expanded={showUserInfo}
                         aria-label={showUserInfo ? "Collapse sidebar" : "Expand sidebar"}
                     >
@@ -91,6 +94,8 @@ export const Sidebar = ({ showUserInfo, onToggle }: AsideProps) => {
                         ({onlineUsers.length - 1 === -1 ? 0 : onlineUsers.length - 1} online)
                     </span>
                 </div>
+
+                <div>+</div>
             </div>
 
             <div className="overflow-y-auto w-full py-3">
@@ -101,14 +106,14 @@ export const Sidebar = ({ showUserInfo, onToggle }: AsideProps) => {
                             key={user._id}
                             onClick={() => {
                                 setSelectedUser(user);
-                                onToggle?.(false);
+                                setShowUserInfo(false);
                             }}
                             className={`
                                 w-full p-3 flex items-center gap-3 relative transition-colors
                                 ${selectedUser?._id === user._id ? "bg-base-300 ring-1 ring-base-300" : ""}
                                 ${chatData
-                                ? "bg-secondary/30 hover:bg-secondary/50 ring-1 ring-base-300"
-                                : "hover:bg-base-300"}
+                                    ? "bg-secondary/30 hover:bg-secondary/50 ring-1 ring-base-300"
+                                    : "hover:bg-base-300"}
                             `}
                         >
                             <div className={`relative ${showUserInfo ? "mx-0" : "mx-auto"} lg:mx-0`}>
@@ -122,11 +127,11 @@ export const Sidebar = ({ showUserInfo, onToggle }: AsideProps) => {
                                 )}
 
                                 {chatData && !showUserInfo && chatData.unreadCount > 0 && (
-          <span className="absolute top-0 right-0 min-w-[18px] h-4 text-[10px] font-semibold flex items-center justify-center bg-red-500 text-white rounded-full">
-            {chatData.unreadCount}
-          </span>
-        )}
-                                
+                                    <span className="absolute top-0 right-0 min-w-[18px] h-4 text-[10px] font-semibold flex items-center justify-center bg-red-500 text-white rounded-full">
+                                        {chatData.unreadCount}
+                                    </span>
+                                )}
+
                             </div>
 
                             <div className={`${showUserInfo ? "block" : "hidden"} lg:block text-left min-w-0 flex-1`}>

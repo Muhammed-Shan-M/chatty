@@ -22,6 +22,9 @@ export const useAuthStore = create<AuthStateType>((set, get) => ({
     isCheckingAuth: true,
     onlineUsers: [],
     socket: null,
+    showUserInfo: false,
+
+    setShowUserInfo: (val) => set({ showUserInfo: val }),
 
     checkAuth: async () => {
         try {
@@ -134,6 +137,7 @@ export const useAuthStore = create<AuthStateType>((set, get) => ({
 
         socket.on('getOnlineUsers', (userIds) => {
             set({ onlineUsers: userIds })
+            useChatStore.getState().getUsers()
         })
 
 
@@ -142,10 +146,16 @@ export const useAuthStore = create<AuthStateType>((set, get) => ({
 
             if (!authUser) return;
 
-
             if (selectedUser?._id === notification.senderId) {
                 try {
+                    if (get().showUserInfo) {
+                        emitNotification(notification);
+                        fetchUnreadMessages(authUser._id);
+                        return 
+                    }
+
                     const res = await markAsRead(authUser._id, selectedUser?._id!);
+
                     if (res.data.success) return;
                 } catch (err) {
                     errorHandler(err)

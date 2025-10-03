@@ -17,6 +17,6 @@ export interface ChatStore {
     sendVoiceMessage: (audio: FormData) => Promise<void>
     subscribeToMessages: () => void
     unsubscribeFromMessages: () => void
-    setSelectedUser: (selecteduser: User | null) => void
+    setSelectedUser: (selecteduser: User | null) => Promise<void>
     fetchUnreadMessages: (userId: string) => Promise<void>
 }
