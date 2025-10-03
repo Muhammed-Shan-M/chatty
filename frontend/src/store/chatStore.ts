@@ -57,12 +57,12 @@ export const useChatStore = create<ChatStore>((set, get) => ({
         }
     },
 
-    sendVoiceMessage: async (audio: FormData) => {
+    sendVoiceMessage: async (file: FormData) => {
         set({ isSendMessageLoading: true })
         const { messages, selectedUser } = get()
         try {
-            console.log(messages, selectedUser, audio)
-            const res = await axiosInstance.post(`/messages/send-voice/${selectedUser?._id}`, audio)
+            console.log(messages, selectedUser, file)
+            const res = await axiosInstance.post(`/messages/send-voice/${selectedUser?._id}`, file)
             set({ messages: [...messages, res.data] })
         } catch (error) {
             errorHandler(error)
