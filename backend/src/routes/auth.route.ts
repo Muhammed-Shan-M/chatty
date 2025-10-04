@@ -1,7 +1,7 @@
 import express from 'express'
 import { checkAuth, login, logout, signup, updateFullName, updateProfilePicture } from '../controllers/auth.controller.ts'
 import { protectedRoute } from '../middleware/auth.middleware.ts'
-import upload from '../middleware/multer.middleware.ts'
+import upload from '../middleware/multer.ts'
 
 const route = express.Router()
 

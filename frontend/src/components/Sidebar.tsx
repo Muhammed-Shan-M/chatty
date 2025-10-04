@@ -26,15 +26,15 @@ export const Sidebar = () => {
         }))
     );
 
-     const { onlineUsers, authUser } = useAuthStore(
+     const { onlineUsers, authUser,showUserInfo,setShowUserInfo } = useAuthStore(
         useShallow((state: AuthStateType) => ({
             onlineUsers: state.onlineUsers,
             authUser: state.authUser,
+            showUserInfo: state.showUserInfo,
+            setShowUserInfo: state.setShowUserInfo
         }))
      )
 
-     const showUserInfo = useAuthStore((state) => state.showUserInfo)
-     const setShowUserInfo = useAuthStore((state) => state.setShowUserInfo);
 
     const [showOnlineOnly, setShowOnlineOnly] = useState(false);
     const [sortedUsers, setSortedUsers] = useState<User[] | null>(null)
@@ -88,22 +88,22 @@ export const Sidebar = () => {
     }, [authUser, fetchUnreadMessages])
 
 
-// useEffect(() => {
-//     const mediaQuery = window.matchMedia('(min-width: 1024px)')
+useEffect(() => {
+    const mediaQuery = window.matchMedia('(min-width: 1024px)')
 
-//     if (mediaQuery.matches) {
-//         setShowUserInfo(false)
-//     }
+    if (mediaQuery.matches) {
+        setShowUserInfo(false)
+    }
 
-//     const handler = (e: MediaQueryListEvent) => {
-//         if (e.matches) {
-//             setShowUserInfo(false)
-//         }
-//     }
+    const handler = (e: MediaQueryListEvent) => {
+        if (e.matches) {
+            setShowUserInfo(false)
+        }
+    }
 
-//     mediaQuery.addEventListener('change', handler)
-//     return () => mediaQuery.removeEventListener('change', handler)
-// }, [])
+    mediaQuery.addEventListener('change', handler)
+    return () => mediaQuery.removeEventListener('change', handler)
+}, [])
 
 
     if (isUsersLoading) return <SidebarSkeleton />;

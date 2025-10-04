@@ -1,8 +1,8 @@
 import express from 'express'
 import { protectedRoute } from '../middleware/auth.middleware.ts'
-import upload from '../middleware/multer.middleware.ts'
 import { addMember, createGroup, editGroupInfo, fecthGroupInfo, getuserGroup, putAsAdmin, removeFromeAdmin, removeMember } from '../controllers/group.controller.ts'
 import { isAdmin } from '../middleware/isAdmin.middleware.ts'
+import upload from '../middleware/multer.ts'
 
 
 const route = express.Router()
