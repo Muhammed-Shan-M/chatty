@@ -13,7 +13,7 @@ export interface ChatStore {
     getUsers: () => Promise<void>
     getMessages: (userId: string) => Promise<void>
     sendMessage: (messageData: FormData) => Promise<void>
-    sendVoiceMessage: (audio: FormData) => Promise<void>
+    sendVoiceMessage: (file: FormData) => Promise<void>
     subscribeToMessages: () => void
     unsubscribeFromMessages: () => void
     setSelectedUser: (selecteduser: User | null) => Promise<void>

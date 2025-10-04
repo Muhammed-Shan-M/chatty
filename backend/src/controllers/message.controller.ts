@@ -94,26 +94,37 @@ export const sendMessage = async (req: Request, res: Response, next: NextFunctio
 
 export const sendVoiceMessage = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const audio = req.file
-        console.log(audio)
+        const files = req.files as { [fieldname: string]: Express.Multer.File[] }
+
+        const voice = files.voice
+        const image = files.image
+
+        console.log(voice,image)
+
+        if(!voice && !image)throw new AppError('No audio file uploaded. Please provide an audio file.', 400)
 
         const reciverId = req.params.id
         const senderId = req.user?._id
 
         let audioUrl
-        if (audio) {
-            audioUrl = await uploadToCloudinary(audio, true)
-        } else {
-            throw new AppError('No audio file uploaded. Please provide an audio file.', 400)
+        let imageUrl
+
+        if (voice && voice?.[0]) {
+            audioUrl = await uploadToCloudinary(voice?.[0], true)
+        } 
+
+        if(image && image?.[0]) {
+            imageUrl = await uploadToCloudinary(image?.[0], false) 
         }
 
-        const preview = buildPreview({ audio: audioUrl })
+        const preview = buildPreview({ audio: audioUrl, image: imageUrl })
         const chatId = findChatId(senderId?.toString()!, reciverId?.toString()!)
 
         const newMessage = new Message({
             senderId,
             reciverId,
             audio: audioUrl,
+            image: imageUrl,
             chatId,
             preview
         })

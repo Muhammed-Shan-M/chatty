@@ -1,12 +1,13 @@
+
+
+
 import { Users, ChevronsRight, Plus, ChevronDown } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useChatStore } from '../store/chatStore';
 import { useAuthStore } from '../store/useAuthStore';
 import { SidebarSkeleton } from './Skeleton/SidebarSkeleton ';
 import type { User } from '../types/user';
-
 import { useShallow } from 'zustand/react/shallow';
-
 import type { ChatStore } from '../types/chatStore';
 import type { AuthStateType } from '../types/userAuthStoreType';
 
@@ -40,21 +41,29 @@ export const Sidebar = () => {
     const [showGroups, setShowGroups] = useState(true)
 
 
-    const filteredUsers = showOnlineOnly
-        ? users.filter((user) => onlineUsers.includes(user._id))
-        : users.reduce((acc, user) => {
-            if (onlineUsers.includes(user._id)) {
-                acc.unshift(user)
-            } else {
-                acc.push(user)
-            }
-            return acc
-        }, [] as User[])
 
 
-    const unreadMap = Object.fromEntries(
-        unreadMessages.map((msg) => [msg._id, msg])
-    );
+    const filteredUsers = useMemo(() => {
+        return showOnlineOnly
+            ? users.filter((user) => onlineUsers.includes(user._id))
+            : users.reduce((acc, user) => {
+                if (onlineUsers.includes(user._id)) {
+                    acc.unshift(user);
+                } else {
+                    acc.push(user);
+                }
+                return acc;
+            }, [] as User[]);
+    }, [showOnlineOnly, users, onlineUsers]);
+
+
+
+    const unreadMap = useMemo(() => {
+        return Object.fromEntries(
+            unreadMessages.map((msg) => [msg._id, msg])
+        );
+    }, [unreadMessages]);
+
 
     useEffect(() => {
         const sorted = filteredUsers.reduce((acc, user) => {
