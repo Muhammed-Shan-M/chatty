@@ -1,7 +1,7 @@
 import express from 'express'
 import { protectedRoute } from '../middleware/auth.middleware.ts'
 import { fetchAllUserForSideBar, getMessages, getUnreadMessages, markAsRead, sendMessage, sendVoiceMessage } from '../controllers/message.controller.ts'
-import upload from '../middleware/multer.ts'
+import upload from '../middleware/multer.middleware.ts'
 
 const router = express.Router()
 
