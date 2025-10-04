@@ -36,7 +36,6 @@ export const createGroup = async (req: Request, res: Response, next: NextFunctio
 }
 
 
-
 export const editGroupInfo = async (req:Request, res: Response, next: NextFunction) => {
     try {
         const {description} = req.body

@@ -13,7 +13,7 @@ import type { AuthStateType } from '../types/userAuthStoreType';
 
 
 
-export const Sidebar = () => {
+export const Sidebar = ({cbForModal}:{cbForModal: () => void}) => {
     const {unreadMessages,fetchUnreadMessages,getUsers,users,selectedUser,setSelectedUser,isUsersLoading} = useChatStore(
         useShallow((state: ChatStore) => ({
             unreadMessages: state.unreadMessages,
@@ -148,7 +148,7 @@ useEffect(() => {
                 </div>
 
                 <div className={`mt-3 ${showUserInfo ? "block" : "hidden"} lg:block`}>
-                    <button className="btn btn-primary btn-sm w-full gap-2">
+                    <button className="btn btn-primary btn-sm w-full gap-2" onClick={() => cbForModal()}>
                         <Plus className="size-4" />
                         <span>Create A Group</span>
                     </button>
