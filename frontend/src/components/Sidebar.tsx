@@ -10,11 +10,15 @@ import type { User } from '../types/user';
 import { useShallow } from 'zustand/react/shallow';
 import type { ChatStore } from '../types/chatStore';
 import type { AuthStateType } from '../types/userAuthStoreType';
+import { UsersList } from './Helpingcomponents/UsersList';
+import { useGroupStore } from '../store/group';
+import type { GroupStore } from '../types/groupStore';
+import { GroupList } from './Helpingcomponents/GroupList';
 
 
 
-export const Sidebar = ({cbForModal}:{cbForModal: () => void}) => {
-    const {unreadMessages,fetchUnreadMessages,getUsers,users,selectedUser,setSelectedUser,isUsersLoading} = useChatStore(
+export const Sidebar = ({ cbForModal }: { cbForModal: () => void }) => {
+    const { unreadMessages, fetchUnreadMessages, getUsers, users, selectedUser, setSelectedUser, isUsersLoading } = useChatStore(
         useShallow((state: ChatStore) => ({
             unreadMessages: state.unreadMessages,
             fetchUnreadMessages: state.fetchUnreadMessages,
@@ -26,14 +30,21 @@ export const Sidebar = ({cbForModal}:{cbForModal: () => void}) => {
         }))
     );
 
-     const { onlineUsers, authUser,showUserInfo,setShowUserInfo } = useAuthStore(
+    const { onlineUsers, authUser, showUserInfo, setShowUserInfo } = useAuthStore(
         useShallow((state: AuthStateType) => ({
             onlineUsers: state.onlineUsers,
             authUser: state.authUser,
             showUserInfo: state.showUserInfo,
             setShowUserInfo: state.setShowUserInfo
         }))
-     )
+    )
+
+    const { groups, fecthGroups } = useGroupStore(
+        useShallow((state: GroupStore) => ({
+            groups: state.groups,
+            fecthGroups: state.fecthGroups
+        }))
+    )
 
 
     const [showOnlineOnly, setShowOnlineOnly] = useState(false);
@@ -79,7 +90,8 @@ export const Sidebar = ({cbForModal}:{cbForModal: () => void}) => {
 
     useEffect(() => {
         getUsers();
-    }, [getUsers]);
+        fecthGroups()
+    }, [getUsers, fecthGroups]);
 
     useEffect(() => {
         if (authUser) {
@@ -88,22 +100,22 @@ export const Sidebar = ({cbForModal}:{cbForModal: () => void}) => {
     }, [authUser, fetchUnreadMessages])
 
 
-useEffect(() => {
-    const mediaQuery = window.matchMedia('(min-width: 1024px)')
+    useEffect(() => {
+        const mediaQuery = window.matchMedia('(min-width: 1024px)')
 
-    if (mediaQuery.matches) {
-        setShowUserInfo(false)
-    }
-
-    const handler = (e: MediaQueryListEvent) => {
-        if (e.matches) {
+        if (mediaQuery.matches) {
             setShowUserInfo(false)
         }
-    }
 
-    mediaQuery.addEventListener('change', handler)
-    return () => mediaQuery.removeEventListener('change', handler)
-}, [])
+        const handler = (e: MediaQueryListEvent) => {
+            if (e.matches) {
+                setShowUserInfo(false)
+            }
+        }
+
+        mediaQuery.addEventListener('change', handler)
+        return () => mediaQuery.removeEventListener('change', handler)
+    }, [])
 
 
     if (isUsersLoading) return <SidebarSkeleton />;
@@ -155,86 +167,72 @@ useEffect(() => {
                 </div>
             </div>
 
-            <div className="border-b border-base-300">
+            {/* <div className="border-b border-base-300 ">
                 <button
                     onClick={() => setShowGroups(!showGroups)}
-                    className={`w-full p-3 flex items-center justify-between hover:bg-base-200 transition-colors ${showUserInfo ? "" : "justify-center"} lg:justify-between`}
+                    className={`w-full ${showUserInfo ? 'p-3' : 'p-1'} flex items-center justify-between hover:bg-base-200 transition-colors sticky top-0 z-50 bg-base-100`}
                 >
-                    <div className={`flex items-center gap-2 ${showUserInfo ? "block" : "hidden"} lg:block`}>
-                        <span className="font-medium text-sm">Groups</span>
-                        <span className="text-xs text-zinc-500">(0)</span>
+                    <div className="flex items-center gap-1">
+                        <span className={`font-medium ${showUserInfo ? 'text-sm' : 'text-xs'}`}>Groups</span>
+                        <span className="text-xs text-zinc-500">({groups.length})</span>
                     </div>
                     <ChevronDown
-                        className={`size-5 transition-transform ${showGroups ? "" : "-rotate-90"} ${showUserInfo ? "block" : "hidden"} lg:block`}
+                        className={`size-5 transition-transform ${showGroups ? "" : "-rotate-90"}`}
                     />
                 </button>
 
-                {/* Groups list area - collapsible */}
                 {showGroups && (
-                    <div className={`pb-2 ${showUserInfo ? "block" : "hidden"} lg:block`}>
-                        <div className="px-3 py-4 text-center text-sm text-zinc-500">No groups yet</div>
+                    <div className="pb-2 lg:block">
+                        {groups.length > 0 ? (
+                            groups.map((group) => (
+                                <GroupList key={group._id} group={group} />
+                            ))
+                        ) : (
+                            <div className="px-3 py-4 text-center text-sm text-zinc-500">
+                                No groups yet
+                            </div>
+                        )}
+                    </div>
+                )}
+            </div> */}
+
+
+            <div className="border-b border-base-300">
+                <button
+                    onClick={() => setShowGroups(!showGroups)}
+                    className={`w-full ${showUserInfo ? 'p-3' : 'p-1'} flex items-center justify-between hover:bg-base-200 transition-colors sticky top-0 z-50 bg-base-100`}
+                >
+                    <div className="flex items-center gap-1">
+                        <span className={`font-medium ${showUserInfo ? 'text-sm' : 'text-xs'}`}>Groups</span>
+                        <span className="text-xs text-zinc-500">({groups.length})</span>
+                    </div>
+                    <ChevronDown
+                        className={`size-5 transition-transform ${showGroups ? "" : "-rotate-90"}`}
+                    />
+                </button>
+
+                {showGroups && (
+                    <div className="pb-2 max-h-[250px] overflow-y-auto overflow-x-hidden">
+                        {groups.length > 0 ? (
+                            groups.map((group) => (
+                                <GroupList key={group._id} group={group} />
+                            ))
+                        ) : (
+                            <div className="px-3 py-4 text-center text-sm text-zinc-500">
+                                No groups yet
+                            </div>
+                        )}
                     </div>
                 )}
             </div>
 
-            <div className="overflow-y-auto w-full py-3">
-                {sortedUsers?.map((user: any) => {
-                    const chatData = unreadMap[user.chatId]
-                    return (
-                        <button
-                            key={user._id}
-                            onClick={() => {
-                                setSelectedUser(user)
-                                setShowUserInfo(false)
-                            }}
-                            className={`
-                                w-full p-3 flex items-center gap-3 relative transition-colors
-                                ${selectedUser?._id === user._id ? "bg-base-300 ring-1 ring-base-300" : ""}
-                                ${chatData
-                                    ? "bg-secondary/30 hover:bg-secondary/50 ring-1 ring-base-300"
-                                    : "hover:bg-base-300"
-                                }
-                            `}
-                        >
-                            <div className={`relative ${showUserInfo ? "mx-0" : "mx-auto"} lg:mx-0`}>
-                                <img
-                                    src={user.profile || "/avatar.png"}
-                                    alt={user.fullName}
-                                    className="size-12 object-cover rounded-full"
-                                />
-                                {onlineUsers.includes(user._id) && (
-                                    <span className="absolute bottom-0 right-0 size-3 bg-green-500 rounded-full ring-2 ring-zinc-900" />
-                                )}
-
-                                {chatData && !showUserInfo && chatData.unreadCount > 0 && (
-                                    <span className="absolute top-0 right-0 min-w-[18px] h-4 text-[10px] font-semibold flex items-center justify-center bg-red-500 text-white rounded-full lg:hidden">
-                                        {chatData.unreadCount}
-                                    </span>
-                                )}
-                            </div>
-
-                            <div className={`${showUserInfo ? "block" : "hidden"} lg:block text-left min-w-0 flex-1`}>
-                                <div className="font-medium truncate">{user.userName}</div>
-                                <div className="text-sm text-zinc-400 flex justify-between items-center">
-                                    {chatData ? (
-                                        <>
-                                            <div className="truncate">{chatData.lastMessage}</div>
-                                            {chatData.unreadCount > 0 && (
-                                                <span className="ml-2 min-w-[20px] h-5 text-xs font-semibold flex items-center justify-center bg-red-500 text-white rounded-full">
-                                                    {chatData.unreadCount}
-                                                </span>
-                                            )}
-                                        </>
-                                    ) : (
-                                        <div>{onlineUsers.includes(user._id) ? "Online" : "Offline"}</div>
-                                    )}
-                                </div>
-                            </div>
-                        </button>
-                    )
-                })}
-
-                {filteredUsers.length === 0 && <div className="text-center text-zinc-500 py-4">No online users</div>}
+            <div className="overflow-y-auto overflow-x-hidden w-full py-3 max-h-[calc(100vh-300px)]">
+                {sortedUsers?.map((user: User) => (
+                    <UsersList key={user._id} chatData={unreadMap[user.chatId]} user={user} />
+                ))}
+                {filteredUsers.length === 0 && (
+                    <div className="text-center text-zinc-500 py-4">No online users</div>
+                )}
             </div>
         </aside>
 

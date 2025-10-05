@@ -1,8 +1,11 @@
 "use client"
 
-import { useState } from "react"
-import { X, Search, Upload } from "lucide-react"
+import React, { useRef, useState } from "react"
+import { X, Search, Upload, XCircle } from "lucide-react"
 import { useChatStore } from "../../store/chatStore"
+import type { User } from "../../types/user"
+import { toast } from "react-toastify"
+import { useGroupStore } from "../../store/group"
 
 interface CreateGroupModalProps {
     isOpen: boolean
@@ -13,16 +16,19 @@ export default function CreateGroupModal({ isOpen, onClose }: CreateGroupModalPr
     const [groupName, setGroupName] = useState("")
     const [description, setDescription] = useState("")
     const [selectedAvatar, setSelectedAvatar] = useState("")
-    const [selectedMembers, setSelectedMembers] = useState<any[]>([])
+    const [selectedMembers, setSelectedMembers] = useState<User[]>([])
     const [searchQuery, setSearchQuery] = useState("")
+    const avatarRef = useRef<HTMLInputElement | null>(null)
 
     const avatarOptions = [
         "https://api.dicebear.com/7.x/shapes/svg?seed=group1",
         "https://api.dicebear.com/7.x/shapes/svg?seed=group2",
         "https://api.dicebear.com/7.x/shapes/svg?seed=group3",
+        "https://api.dicebear.com/7.x/shapes/svg?seed=group4",
     ]
 
     const { users } = useChatStore()
+    const { isCreatingGroup, createGroup} = useGroupStore()
 
     const filteredUsers = users.filter((user) =>
         user.userName?.toLowerCase().includes(searchQuery.toLowerCase()),
@@ -38,21 +44,49 @@ export default function CreateGroupModal({ isOpen, onClose }: CreateGroupModalPr
         setSelectedMembers(selectedMembers.filter((m) => m._id !== userId))
     }
 
-    const handleCreate = () => {
-        // if (groupName.trim()) {
-        //   onCreateGroup({
-        //     name: groupName,
-        //     description,
-        //     avatar: selectedAvatar || avatarOptions[0],
-        //     members: selectedMembers,
-        //   })
-        //   // Reset form
-        //   setGroupName("")
-        //   setDescription("")
-        //   setSelectedAvatar("")
-        //   setSelectedMembers([])
-        //   setSearchQuery("")
-        // }
+    const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0]
+        if (!file) return
+
+        const previewUrl = URL.createObjectURL(file)
+        setSelectedAvatar(previewUrl)
+    }
+
+    const removeSelectedAvatar = () => {
+        setSelectedAvatar('')
+        if(avatarRef.current)avatarRef.current = null
+    }
+
+    const resetAllStates = () => {
+        removeSelectedAvatar()
+        setDescription('')
+        setGroupName('')
+        setSearchQuery('')
+        setSelectedMembers([])
+    }
+
+    const handleCreate = async () => {
+        if(!groupName || selectedMembers.length === 0){
+            toast.error('Please select at least one user and provide a group name to proceed with group creation')
+            return
+        }
+
+        const memberIds: string[] = selectedMembers.map((member) => member._id)
+
+        const formdata = new FormData()
+        formdata.append('members',JSON.stringify(memberIds))
+        formdata.append('groupName', groupName)
+        formdata.append('description', description)
+        
+        if(avatarRef.current && avatarRef.current.files?.[0]){
+            formdata.append('avatar', avatarRef.current.files?.[0])
+        }else if(selectedAvatar.startsWith('https://')){
+            formdata.append('avatarUrl', selectedAvatar)
+        }
+
+        await createGroup(formdata)
+        onClose()
+        resetAllStates()
     }
 
     if (!isOpen) return null
@@ -74,20 +108,31 @@ export default function CreateGroupModal({ isOpen, onClose }: CreateGroupModalPr
                         <label className="label">
                             <span className="label-text font-medium">Avatar</span>
                         </label>
-                        <div className="relative">
+                        <div className="relative ">
                             <div className="size-24 rounded-full bg-base-200 border-2 border-base-300 overflow-hidden flex items-center justify-center cursor-pointer hover:border-primary transition-colors">
                                 {selectedAvatar ? (
-                                    <img
-                                        src={selectedAvatar || "/placeholder.svg"}
-                                        alt="Group avatar"
-                                        className="w-full h-full object-cover"
-                                    />
+                                    <div className="relative group w-32 h-32 rounded-lg overflow-hidden">
+                                        <img
+                                            src={selectedAvatar || "/placeholder.svg"}
+                                            alt="Group avatar"
+                                            className="w-full h-full object-cover"
+                                        />
+                                        <label
+                                            htmlFor="avatar-upload"
+                                            className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition cursor-pointer"
+                                        >
+                                            <Upload className="size-8 text-white" />
+                                        </label>
+                                    </div>
                                 ) : (
-                                    <Upload className="size-8 text-base-content/40" />
+                                    <label htmlFor="avatar-upload"><Upload className="size-8 text-base-content/40" /></label>
                                 )}
+                                <input ref={avatarRef} type="file" className="hidden" id="avatar-upload" accept="image" onChange={handleImageUpload} />
                             </div>
+
+
                             {/* Avatar Options Dropdown */}
-                            <div className="mt-2 flex gap-2">
+                            <div className="mt-2 grid gap-2 grid-cols-2 lg:grid-cols-4">
                                 {avatarOptions.map((avatar, index) => (
                                     <button
                                         key={index}
@@ -103,6 +148,16 @@ export default function CreateGroupModal({ isOpen, onClose }: CreateGroupModalPr
                                     </button>
                                 ))}
                             </div>
+
+                            {selectedAvatar &&
+                                <span className="mt-3 block" onClick={removeSelectedAvatar}>
+                                    <div className="flex items-center justify-center gap-2 text-error cursor-pointer rounded-md px-3 py-1 hover:bg-error/10 transition">
+                                        <XCircle className="size-5" />
+                                        <span>Clear avatar</span>
+                                    </div>
+                                </span>
+                            }
+
                         </div>
                     </div>
 
@@ -215,8 +270,8 @@ export default function CreateGroupModal({ isOpen, onClose }: CreateGroupModalPr
                     <button onClick={onClose} className="btn btn-ghost">
                         Cancel
                     </button>
-                    <button onClick={handleCreate} className="btn btn-primary" disabled={!groupName.trim()}>
-                        Create Group
+                    <button onClick={handleCreate} className="btn btn-primary" disabled={!groupName.trim() || selectedMembers.length === 0 || isCreatingGroup}>
+                        {isCreatingGroup ? 'Loading...' : 'Create Group'}
                     </button>
                 </div>
             </div>

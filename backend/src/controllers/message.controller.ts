@@ -8,13 +8,15 @@ import { buildPreview } from "../utility/buidePreview.ts"
 import mongoose from "mongoose"
 import { findChatId } from "../utility/findChatId.ts"
 
+
+
 export const fetchAllUserForSideBar = async (req: Request, res: Response) => {
     try {
         const loggedInUserId = req.user?._id
         const filteredUsers = await User.find({ _id: { $ne: loggedInUserId } }).select('-password')
 
         const usersWithChatId = filteredUsers.map((item) => ({ ...item.toObject(), chatId: findChatId(loggedInUserId?.toString()!, item._id.toString()!) }))
-        console.log('all users : ', usersWithChatId)
+
         res.status(200).json(usersWithChatId)
 
     } catch (error) {

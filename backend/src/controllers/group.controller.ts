@@ -6,30 +6,32 @@ import { uploadToCloudinary } from "../utility/cloudinaryuploader.utility.ts"
 
 export const createGroup = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const [name, members, adminId, description] = req.body
+        const {groupName, description} = req.body
 
         const avatar = req.file
         const userId = req.user?._id
+        const members = JSON.parse(req.body.members)
+        const adminId = req.user?._id
+        let avatarUrl = req.body.avatarUrl || ''
         
-        if(!name || members.length === 0)throw new AppError('Group creation requires a valid group name and at least one member.', 400)
-
-        let avatharUrl 
+        if(!groupName || members.length === 0)throw new AppError('Group creation requires a valid group name and at least one member.', 400)
+ 
         if(avatar) {
-            avatharUrl = await uploadToCloudinary(avatar,false)
+            avatarUrl = await uploadToCloudinary(avatar,false)
         }
 
         const newGroup = new Group({
-            groupName: name, 
-            members: [...members],
-            admins:[adminId || userId],
+            groupName: groupName, 
+            members: [...members,userId],
+            admins:[adminId],
             owner: userId,
-            avatar: avatharUrl || '',
+            avatar: avatarUrl || '',
             description: description || ''
         })
 
         newGroup.save()
 
-        res.status(201).json({success: true, newGroup})
+        res.status(201).json(newGroup)
     } catch (error) {
         next(error)
     }
@@ -86,11 +88,13 @@ export const fecthGroupInfo = async (req:Request, res: Response, next: NextFunct
 
 export const getuserGroup = async (req:Request, res: Response, next: NextFunction) => {
     try {
-        const userId = req.params.id
+        const userId = req.user?._id
 
-        if(userId)throw new AppError('The specified user does not exist.', 401)
+        if(!userId)throw new AppError('The specified user does not exist.', 401)
 
-        const groups = Group.find({members: userId}).populate('members')
+        const groups = await Group.find({members: userId}).populate('members')
+
+        console.log(groups)
 
         res.status(200).json(groups)
     } catch (error) {

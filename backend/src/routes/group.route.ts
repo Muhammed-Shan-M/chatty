@@ -12,10 +12,13 @@ route.post('/create-group', protectedRoute,upload.single('avatar'),createGroup)
 route.patch('/edit-group-info/:id',protectedRoute,isAdmin,upload.single('avatar'),editGroupInfo)
 
 route.get('/get-group-info/:id',protectedRoute,fecthGroupInfo)
-route.get('/get-users-group/:id',protectedRoute,getuserGroup)
+route.get('/get-users-group',protectedRoute,getuserGroup)
 
 route.patch('/put-as-admin/:id',protectedRoute,isAdmin,putAsAdmin)
 route.patch('/remove-a-admin/:id',protectedRoute,isAdmin,removeFromeAdmin)
 
 route.patch('/add-a-member/:id',protectedRoute,isAdmin,addMember)
 route.patch('/remove-a-member/:id',protectedRoute,isAdmin,removeMember)
+
+
+export default route
