@@ -18,14 +18,12 @@ import { GroupList } from './Helpingcomponents/GroupList';
 
 
 export const Sidebar = ({ cbForModal }: { cbForModal: () => void }) => {
-    const { unreadMessages, fetchUnreadMessages, getUsers, users, selectedUser, setSelectedUser, isUsersLoading } = useChatStore(
+    const { unreadMessages, fetchUnreadMessages, getUsers, users, isUsersLoading } = useChatStore(
         useShallow((state: ChatStore) => ({
             unreadMessages: state.unreadMessages,
             fetchUnreadMessages: state.fetchUnreadMessages,
             getUsers: state.getUsers,
             users: state.users,
-            selectedUser: state.selectedUser,
-            setSelectedUser: state.setSelectedUser,
             isUsersLoading: state.isUsersLoading,
         }))
     );
@@ -166,35 +164,6 @@ export const Sidebar = ({ cbForModal }: { cbForModal: () => void }) => {
                     </button>
                 </div>
             </div>
-
-            {/* <div className="border-b border-base-300 ">
-                <button
-                    onClick={() => setShowGroups(!showGroups)}
-                    className={`w-full ${showUserInfo ? 'p-3' : 'p-1'} flex items-center justify-between hover:bg-base-200 transition-colors sticky top-0 z-50 bg-base-100`}
-                >
-                    <div className="flex items-center gap-1">
-                        <span className={`font-medium ${showUserInfo ? 'text-sm' : 'text-xs'}`}>Groups</span>
-                        <span className="text-xs text-zinc-500">({groups.length})</span>
-                    </div>
-                    <ChevronDown
-                        className={`size-5 transition-transform ${showGroups ? "" : "-rotate-90"}`}
-                    />
-                </button>
-
-                {showGroups && (
-                    <div className="pb-2 lg:block">
-                        {groups.length > 0 ? (
-                            groups.map((group) => (
-                                <GroupList key={group._id} group={group} />
-                            ))
-                        ) : (
-                            <div className="px-3 py-4 text-center text-sm text-zinc-500">
-                                No groups yet
-                            </div>
-                        )}
-                    </div>
-                )}
-            </div> */}
 
 
             <div className="border-b border-base-300">
