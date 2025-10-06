@@ -3,7 +3,7 @@ import type { Types, Document } from "mongoose"
 
 export interface GroupMessagesAttachment {
     url: string,
-    fileType: string
+    fileType: 'image'|'voice'
 } 
 
 export interface GroupMessage {

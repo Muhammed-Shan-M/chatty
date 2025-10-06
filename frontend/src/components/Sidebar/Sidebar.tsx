@@ -195,7 +195,7 @@ export const Sidebar = ({ cbForModal }: { cbForModal: () => void }) => {
                 )}
             </div>
 
-            <div className="overflow-y-auto overflow-x-hidden w-full py-3 max-h-[calc(100vh-300px)]">
+            <div className="overflow-y-auto overflow-x-hidden w-full py-3 ">
                 {sortedUsers?.map((user: User) => (
                     <UsersList key={user._id} chatData={unreadMap[user.chatId]} user={user} />
                 ))}

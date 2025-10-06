@@ -35,6 +35,8 @@ export function AudioPlayer({ src, className = "" }: AudioPlayerProps) {
         }
     }, [])
 
+    console.log(src)
+
     const togglePlayPause = () => {
         const audio = audioRef.current
         if (!audio) return

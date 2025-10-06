@@ -26,7 +26,7 @@ export const createGroup = async (req: Request, res: Response, next: NextFunctio
             admins:[adminId],
             owner: userId,
             avatar: avatarUrl || '',
-            description: description || ''
+            description: description || '',
         })
 
         newGroup.save()
@@ -76,7 +76,7 @@ export const fecthGroupInfo = async (req:Request, res: Response, next: NextFunct
 
         if(!groupId)throw new AppError('The specified group does not exist.', 404)
 
-        const groupInfo = await Group.findById(groupId)
+        const groupInfo = await Group.findById(groupId).populate('members')
 
         res.status(200).json(groupInfo)
 

@@ -3,8 +3,10 @@ import type { User } from '../../types/user'
 import { useAuthStore } from '../../store/useAuthStore'
 import { useChatStore } from '../../store/chatStore'
 import type { AuthStateType } from '../../types/userAuthStoreType'
-import { useShallow } from 'zustand/shallow'
+import { shallow, useShallow } from 'zustand/shallow'
 import type { ChatStore } from '../../types/chatStore'
+import { useGroupStore } from '../../store/group'
+import type { GroupStore } from '../../types/groupStore'
 
 type PropsType = {
     chatData: UnreadMessages,
@@ -23,6 +25,12 @@ export const UsersList = ({ chatData, user }: PropsType) => {
         }))
     )
 
+    const {setSelectedGroup} = useGroupStore(
+        useShallow((state: GroupStore) => ({
+            setSelectedGroup: state.setSelectedGroup
+        }))
+    )
+
     const { selectedUser, setSelectedUser } = useChatStore(
         useShallow((state: ChatStore) => ({
             selectedUser: state.selectedUser,
@@ -35,6 +43,7 @@ export const UsersList = ({ chatData, user }: PropsType) => {
             key={user._id}
             onClick={() => {
                 setSelectedUser(user)
+                setSelectedGroup(null)
                 setShowUserInfo(false)
             }}
             className={`

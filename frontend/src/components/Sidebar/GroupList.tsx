@@ -1,22 +1,24 @@
+import { useGroupStore } from '../../store/group';
 import { useAuthStore } from '../../store/useAuthStore';
 import type { IGroup } from '../../types/Group';
 
 interface GroupListItemProps {
     group: IGroup;
-    selectedGroup?: IGroup | null;
+    // selectedGroup?: IGroup | null;
     // add other props like chatData if needed
 }
 
 
-export const GroupList = ({ group, selectedGroup }: GroupListItemProps) => {
+export const GroupList = ({ group }: GroupListItemProps) => {
 
     const { setShowUserInfo, showUserInfo } = useAuthStore()
+    const {selectedGroup, setSelectedGroup} = useGroupStore()
 
     return (
         <button
             key={group._id}
             onClick={() => {
-                // setSelectedGroup(group)
+                setSelectedGroup(group)
                 setShowUserInfo(false)
             }}
             className={`

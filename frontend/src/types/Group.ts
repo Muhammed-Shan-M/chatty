@@ -1,10 +1,12 @@
+import type { User } from "./user";
+
 export interface Group {
     groupName: string,
-    members: string[],
+    members: User[],
     admins: string[],
     owner: string,
     avatar: string,
-    description: string
+    description: string,
 }
 
 
