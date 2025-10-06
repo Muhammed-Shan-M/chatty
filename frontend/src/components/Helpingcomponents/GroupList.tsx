@@ -34,14 +34,14 @@ export const GroupList = ({ group, selectedGroup }: GroupListItemProps) => {
             </div>
 
             {/* Group Info - Only show when showUserInfo is true */}
-            {showUserInfo && (
+
                 <div className="text-left min-w-0 flex-1">
                     <div className="font-medium truncate">{group.groupName}</div>
                     <div className="text-sm text-zinc-400 flex justify-between items-center">
                         {/* Last message preview */}
                     </div>
                 </div>
-            )}
+
         </button>
     )
 }

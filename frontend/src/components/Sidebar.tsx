@@ -115,6 +115,7 @@ export const Sidebar = ({ cbForModal }: { cbForModal: () => void }) => {
         return () => mediaQuery.removeEventListener('change', handler)
     }, [])
 
+    console.log(showUserInfo)
 
     if (isUsersLoading) return <SidebarSkeleton />;
 

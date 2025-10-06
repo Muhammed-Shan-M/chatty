@@ -63,7 +63,7 @@ export const UsersList = ({ chatData, user }: PropsType) => {
                 )}
             </div>
 
-            {showUserInfo && (
+
                 <div className="text-left min-w-0 flex-1">
                     <div className="font-medium truncate">{user.userName}</div>
                     <div className="text-sm text-zinc-400 flex justify-between items-center">
@@ -81,7 +81,7 @@ export const UsersList = ({ chatData, user }: PropsType) => {
                         )}
                     </div>
                 </div>
-            )}
+
         </button>
     )
 }
