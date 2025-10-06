@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { useAuthStore } from '../store/useAuthStore'
 
 import { Eye, EyeOff, Loader2, Lock, Mail, MessageSquare, UserCheck , CircleUser} from 'lucide-react'
-import AuthImagePattern from '../components/AuthImagePattern'
+import AuthImagePattern from '../components/Helpingcomponents/AuthImagePattern'
 import { Link } from 'react-router-dom'
 import type { FormData } from '../types/formData'
 import { validateForm } from '../utility/validationfrom'

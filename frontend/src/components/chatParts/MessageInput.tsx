@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
-import { useChatStore } from "../store/chatStore";
 import { Image, LoaderCircle, Mic, Send, Trash2, X } from "lucide-react";
 import { toast } from "react-toastify";
+import { useChatStore } from "../../store/chatStore";
 
 
 export const MessageInput = () => {

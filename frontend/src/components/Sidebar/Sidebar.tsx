@@ -3,17 +3,17 @@
 
 import { Users, ChevronsRight, Plus, ChevronDown } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
-import { useChatStore } from '../store/chatStore';
-import { useAuthStore } from '../store/useAuthStore';
-import { SidebarSkeleton } from './Skeleton/SidebarSkeleton ';
-import type { User } from '../types/user';
+import { useChatStore } from '../../store/chatStore';
+import { useAuthStore } from '../../store/useAuthStore';
+import { SidebarSkeleton } from '../Skeleton/SidebarSkeleton ';
+import type { User } from '../../types/user';
 import { useShallow } from 'zustand/react/shallow';
-import type { ChatStore } from '../types/chatStore';
-import type { AuthStateType } from '../types/userAuthStoreType';
-import { UsersList } from './Helpingcomponents/UsersList';
-import { useGroupStore } from '../store/group';
-import type { GroupStore } from '../types/groupStore';
-import { GroupList } from './Helpingcomponents/GroupList';
+import type { ChatStore } from '../../types/chatStore';
+import type { AuthStateType } from '../../types/userAuthStoreType';
+import { UsersList } from './UsersList';
+import { useGroupStore } from '../../store/group';
+import type { GroupStore } from '../../types/groupStore';
+import { GroupList } from './GroupList';
 
 
 
@@ -115,7 +115,6 @@ export const Sidebar = ({ cbForModal }: { cbForModal: () => void }) => {
         return () => mediaQuery.removeEventListener('change', handler)
     }, [])
 
-    console.log(showUserInfo)
 
     if (isUsersLoading) return <SidebarSkeleton />;
 

@@ -1,11 +1,11 @@
 import { useChatStore } from '../store/chatStore'
-import { NoChatSelected } from '../components/NoChatSelected'
-import { ChatContainer } from '../components/ChatContainer'
-import { Sidebar } from '../components/Sidebar'
+import { NoChatSelected } from '../components/chatParts/NoChatSelected'
+import { Sidebar } from '../components/Sidebar/Sidebar'
 import { ChatLoadingSkeleton } from '../components/Skeleton/chatLoadingSkeleton'
 import { useAuthStore } from '../store/useAuthStore'
 import CreateGroupModal from '../components/Modals/createGroupModal'
 import { useState } from 'react'
+import { ChatContainer } from '../components/chatParts/ChatContainer'
 
 export const Home = () => {
   const { selectedUser } = useChatStore()

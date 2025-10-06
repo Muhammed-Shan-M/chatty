@@ -1,7 +1,7 @@
 import { Eye, EyeOff, Loader2, Lock, Mail, MessageSquare } from 'lucide-react'
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import AuthImagePattern from '../components/AuthImagePattern'
+import AuthImagePattern from '../components/Helpingcomponents/AuthImagePattern'
 import { useAuthStore } from '../store/useAuthStore'
 import type { LoginFormData } from '../types/loginFormData'
 import { validatePassword } from '../utility/validationfrom'

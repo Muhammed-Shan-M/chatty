@@ -1,6 +1,5 @@
-import React, { useEffect } from 'react'
+import { useEffect } from 'react'
 
-import { Navbar } from './components/Navbar'
 import { Home } from './pages/Home'
 import { Login } from './pages/Login'
 import { Signup } from './pages/Signup'
@@ -13,6 +12,7 @@ import { Routes, Route, Navigate } from 'react-router-dom'
 import { useAuthStore } from './store/useAuthStore'
 import { ToastContainer,Bounce  } from 'react-toastify'
 import { useThemeStore } from './store/themeStore'
+import { Navbar } from './components/Navbar/Navbar'
 
 const App = () => {
 

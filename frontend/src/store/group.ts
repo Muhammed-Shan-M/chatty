@@ -7,6 +7,9 @@ import { axiosInstance } from '../lib/axios'
 export const useGroupStore = create<GroupStore>((set,get) => ({
     groups: [],
     isCreatingGroup: false,
+    
+    isGroupChat: false,
+    selectedGroup: null,
 
 
     createGroup:async (formData) => {
@@ -30,5 +33,9 @@ export const useGroupStore = create<GroupStore>((set,get) => ({
         } catch (error) {
             errorHandler(error)
         }
+    },
+
+    setSelectedGroup: async (group) => {
+        set({isGroupChat: true, selectedGroup: group})
     }
 }))

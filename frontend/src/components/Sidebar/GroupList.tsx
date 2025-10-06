@@ -24,7 +24,7 @@ export const GroupList = ({ group, selectedGroup }: GroupListItemProps) => {
         ${selectedGroup?._id === group._id ? "bg-base-300 ring-1 ring-base-300" : "hover:bg-base-300"}
     `}
         >
-            {/* Avatar */}
+
             <div className={`relative flex-shrink-0 ${showUserInfo ? "" : "mx-auto"}`}>
                 <img
                     src={group.avatar || "/avatar.png"}
@@ -33,7 +33,7 @@ export const GroupList = ({ group, selectedGroup }: GroupListItemProps) => {
                 />
             </div>
 
-            {/* Group Info - Only show when showUserInfo is true */}
+
 
                 <div className="text-left min-w-0 flex-1">
                     <div className="font-medium truncate">{group.groupName}</div>
