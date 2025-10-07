@@ -12,11 +12,11 @@
     "skipLibCheck": true,
 
 
-    "paths": {
-      "@/*": [
-        "./src/*"
-      ]
-    },
+    // "paths": {
+    //   "@/*": [
+    //     "./src/*"
+    //   ]
+    // },
 
 
     /* Bundler mode */
