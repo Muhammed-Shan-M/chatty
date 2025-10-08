@@ -2,12 +2,12 @@
 
 
 import { useGroupStore } from '../../store/group'
-import { Info, LoaderCircle, X } from 'lucide-react'
+import { Info, X } from 'lucide-react'
 
 
 
 export const ChatHeader = () => {
-    const { selectedGroup, setSelectedGroup, fetchGroupInfo, isGroupInfoLoading } = useGroupStore()
+    const { selectedGroup, setSelectedGroup, fetchGroupInfo } = useGroupStore()
 
 
     return (
@@ -32,7 +32,7 @@ export const ChatHeader = () => {
 
                 <div className='flex items-center gap-2 md:gap-5'>
                     <button className='p-2 rounded-md hover:bg-base-200 transition-colors' onClick={() => fetchGroupInfo(selectedGroup?._id!)}>
-                        {isGroupInfoLoading ? <LoaderCircle className='animate-spin' /> : <Info />}
+                        <Info />
                     </button>
                     <button onClick={() => setSelectedGroup(null)}>
                         <X />

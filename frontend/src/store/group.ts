@@ -52,10 +52,22 @@ export const useGroupStore = create<GroupStore>((set,get) => ({
 
     fetchGroupInfo: async (groupId) => {
         set({isGroupInfoLoading: true})
+        get().setShowGroupInfo(true)
         try {
             const res = await axiosInstance.get(`/group/get-group-info/${groupId}`)
-            set({groupInfo: res.data})
-            get().setShowGroupInfo(true)
+            set({groupInfo: res.data})  
+        } catch (error) {
+            errorHandler(error)
+        } finally {
+            set({isGroupInfoLoading: false})
+        }
+    },
+
+    editGroupInfo: async (FormData) => {
+        set({isGroupInfoLoading: true})
+        try {
+            const res = await axiosInstance.patch(`/group/edit-group-info/${get().selectedGroup?._id}`,FormData)
+            set({groupInfo: res.data, selectedGroup: res.data})
         } catch (error) {
             errorHandler(error)
         } finally {

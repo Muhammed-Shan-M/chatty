@@ -4,7 +4,6 @@ import { AppError } from "../errors/appError.errors.ts"
 import bcrypt from "bcryptjs"
 import User from "../models/user.model.ts"
 import { genarateJwt } from "../utility/jwtUtil.utility.ts"
-import cloudinary from "../lib/cloudinary.ts"
 import { uploadToCloudinary } from "../utility/cloudinaryuploader.utility.ts"
 
 

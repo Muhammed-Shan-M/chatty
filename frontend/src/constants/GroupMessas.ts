@@ -1,362 +1,435 @@
 import type { IGroupMessages } from "../types/GroupMessages";
+import type { User } from "../types/user";
+
+
+export const sampleUsers: User[] = [
+  {
+    _id: "68d417cc49cd55839387bc26",
+    fullName: "Muhammed Shan",
+    userName: "shan_m",
+    email: "shan@example.com",
+    password: "hashed_password",
+    createdAt: "2025-09-30T08:00:00.000Z",
+    updatedAt: "2025-10-06T09:00:00.000Z",
+    profile: "https://randomuser.me/api/portraits/men/1.jpg",
+    chatId: "chat001",
+  },
+  {
+    _id: "usr002",
+    fullName: "Rashad Ali",
+    userName: "rashad_a",
+    email: "rashad@example.com",
+    password: "hashed_password",
+    createdAt: "2025-09-30T08:10:00.000Z",
+    updatedAt: "2025-10-06T09:10:00.000Z",
+    profile: "https://randomuser.me/api/portraits/men/2.jpg",
+    chatId: "chat002",
+  },
+  {
+    _id: "usr003",
+    fullName: "Aisha Noor",
+    userName: "aisha_n",
+    email: "aisha@example.com",
+    password: "hashed_password",
+    createdAt: "2025-09-30T08:15:00.000Z",
+    updatedAt: "2025-10-06T09:15:00.000Z",
+    profile: "https://randomuser.me/api/portraits/women/3.jpg",
+    chatId: "chat003",
+  },
+  {
+    _id: "usr004",
+    fullName: "Haroon Faisal",
+    userName: "haroon_f",
+    email: "haroon@example.com",
+    password: "hashed_password",
+    createdAt: "2025-09-30T08:20:00.000Z",
+    updatedAt: "2025-10-06T09:20:00.000Z",
+    profile: "https://randomuser.me/api/portraits/men/4.jpg",
+    chatId: "chat004",
+  },
+  {
+    _id: "usr005",
+    fullName: "Zoya Khan",
+    userName: "zoya_k",
+    email: "zoya@example.com",
+    password: "hashed_password",
+    createdAt: "2025-09-30T08:25:00.000Z",
+    updatedAt: "2025-10-06T09:25:00.000Z",
+    profile: "https://randomuser.me/api/portraits/women/5.jpg",
+    chatId: "chat005",
+  },
+  {
+    _id: "usr006",
+    fullName: "Farhan Rahim",
+    userName: "farhan_r",
+    email: "farhan@example.com",
+    password: "hashed_password",
+    createdAt: "2025-09-30T08:30:00.000Z",
+    updatedAt: "2025-10-06T09:30:00.000Z",
+    profile: "https://randomuser.me/api/portraits/men/6.jpg",
+    chatId: "chat006",
+  },
+];
+
+
 
 export const sampleGroupMessages: IGroupMessages[] = [
   {
     _id: "msg001",
     groupId: "grp101",
-    senderId: "68d417cc49cd55839387bc26",
+    senderId: sampleUsers[0],
     text: "Hey everyone! I just created this group for our project updates.Nice! Looking forward to collaborating here.Nice! Looking forward to collaborating here.",
     attachment: [],
     type: "text",
     createdAt: "2025-10-06T09:00:00.000Z",
-    updatedAt: "2025-10-06T09:00:00.000Z"
+    updatedAt: "2025-10-06T09:00:00.000Z",
   },
   {
     _id: "msg002",
     groupId: "grp101",
-    senderId: "usr002",
+    senderId: sampleUsers[1],
     text: "Nice! Looking forward to collaborating here.",
     attachment: [],
     type: "text",
     createdAt: "2025-10-06T09:02:00.000Z",
-    updatedAt: "2025-10-06T09:02:00.000Z"
+    updatedAt: "2025-10-06T09:02:00.000Z",
   },
   {
     _id: "msg003",
     groupId: "grp101",
-    senderId: "usr003",
+    senderId: sampleUsers[2],
     text: "Here’s our team logo preview!",
     attachment: [
       {
         url: "https://images.unsplash.com/photo-1503023345310-bd7c1de61c7d",
-        fileType: "image"
-      }
+        fileType: "image",
+      },
     ],
     type: "media",
     createdAt: "2025-10-06T09:05:00.000Z",
-    updatedAt: "2025-10-06T09:05:00.000Z"
+    updatedAt: "2025-10-06T09:05:00.000Z",
   },
   {
     _id: "msg004",
     groupId: "grp101",
-    senderId: "usr004",
+    senderId: sampleUsers[3],
     text: "I recorded some notes from our last meeting.",
     attachment: [
       {
         url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
-        fileType: "voice"
-      }
+        fileType: "voice",
+      },
     ],
     type: "voice",
     createdAt: "2025-10-06T09:08:00.000Z",
-    updatedAt: "2025-10-06T09:08:00.000Z"
+    updatedAt: "2025-10-06T09:08:00.000Z",
   },
   {
     _id: "msg005",
     groupId: "grp101",
-    senderId: "68d417cc49cd55839387bc26",
+    senderId: sampleUsers[0],
     text: "That sounds great, I’ll review it today.",
     attachment: [],
     type: "text",
     createdAt: "2025-10-06T09:10:00.000Z",
-    updatedAt: "2025-10-06T09:10:00.000Z"
+    updatedAt: "2025-10-06T09:10:00.000Z",
   },
   {
     _id: "msg006",
     groupId: "grp101",
-    senderId: "usr005",
+    senderId: sampleUsers[4],
     text: "Here’s the reference image and audio intro we discussed.",
     attachment: [
       {
         url: "https://images.unsplash.com/photo-1494790108377-be9c29b29330",
-        fileType: "image"
+        fileType: "image",
       },
       {
         url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3",
-        fileType: "voice"
-      }
+        fileType: "voice",
+      },
     ],
     type: "media",
     createdAt: "2025-10-06T09:12:00.000Z",
-    updatedAt: "2025-10-06T09:12:00.000Z"
+    updatedAt: "2025-10-06T09:12:00.000Z",
   },
   {
     _id: "msg007",
     groupId: "grp101",
-    senderId: "usr002",
+    senderId: sampleUsers[1],
     text: "I’ll share the final design by evening.",
     attachment: [],
     type: "text",
     createdAt: "2025-10-06T09:13:30.000Z",
-    updatedAt: "2025-10-06T09:13:30.000Z"
+    updatedAt: "2025-10-06T09:13:30.000Z",
   },
   {
     _id: "msg008",
     groupId: "grp101",
-    senderId: "68d417cc49cd55839387bc26",
+    senderId: sampleUsers[0],
     text: "Let’s finalize the presentation slides this week.",
     attachment: [],
     type: "text",
     createdAt: "2025-10-06T09:15:00.000Z",
-    updatedAt: "2025-10-06T09:15:00.000Z"
+    updatedAt: "2025-10-06T09:15:00.000Z",
   },
   {
     _id: "msg009",
     groupId: "grp101",
-    senderId: "usr006",
+    senderId: sampleUsers[5],
     text: "Here’s a photo of the setup from the event.",
     attachment: [
       {
         url: "https://images.unsplash.com/photo-1557683316-973673baf926",
-        fileType: "image"
-      }
+        fileType: "image",
+      },
     ],
     type: "media",
     createdAt: "2025-10-06T09:17:00.000Z",
-    updatedAt: "2025-10-06T09:17:00.000Z"
+    updatedAt: "2025-10-06T09:17:00.000Z",
   },
   {
     _id: "msg010",
     groupId: "grp101",
-    senderId: "usr003",
+    senderId: sampleUsers[2],
     text: "Thanks! That looks amazing.",
     attachment: [],
     type: "text",
     createdAt: "2025-10-06T09:18:00.000Z",
-    updatedAt: "2025-10-06T09:18:00.000Z"
+    updatedAt: "2025-10-06T09:18:00.000Z",
   },
   {
     _id: "msg011",
     groupId: "grp101",
-    senderId: "usr004",
+    senderId: sampleUsers[3],
     text: "Uploading a quick voice note.",
     attachment: [
       {
         url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3",
-        fileType: "voice"
-      }
+        fileType: "voice",
+      },
     ],
     type: "voice",
     createdAt: "2025-10-06T09:20:00.000Z",
-    updatedAt: "2025-10-06T09:20:00.000Z"
+    updatedAt: "2025-10-06T09:20:00.000Z",
   },
   {
     _id: "msg012",
     groupId: "grp101",
-    senderId: "68d417cc49cd55839387bc26",
+    senderId: sampleUsers[0],
     text: "Got it. I’ll merge the updates tomorrow morning.",
     attachment: [],
     type: "text",
     createdAt: "2025-10-06T09:22:00.000Z",
-    updatedAt: "2025-10-06T09:22:00.000Z"
+    updatedAt: "2025-10-06T09:22:00.000Z",
   },
   {
     _id: "msg013",
     groupId: "grp101",
-    senderId: "usr005",
+    senderId: sampleUsers[4],
     text: "Here’s a combination of image and voice for review.",
     attachment: [
       {
         url: "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4",
-        fileType: "image"
+        fileType: "image",
       },
       {
         url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3",
-        fileType: "voice"
-      }
+        fileType: "voice",
+      },
     ],
     type: "media",
     createdAt: "2025-10-06T09:23:00.000Z",
-    updatedAt: "2025-10-06T09:23:00.000Z"
+    updatedAt: "2025-10-06T09:23:00.000Z",
   },
   {
     _id: "msg014",
     groupId: "grp101",
-    senderId: "usr002",
+    senderId: sampleUsers[1],
     text: "Text-only again for sync testing.",
     attachment: [],
     type: "text",
     createdAt: "2025-10-06T09:24:00.000Z",
-    updatedAt: "2025-10-06T09:24:00.000Z"
+    updatedAt: "2025-10-06T09:24:00.000Z",
   },
   {
     _id: "msg015",
     groupId: "grp101",
-    senderId: "68d417cc49cd55839387bc26",
+    senderId: sampleUsers[0],
     text: "Looks stable now, I think lag is resolved.",
     attachment: [],
     type: "text",
     createdAt: "2025-10-06T09:25:00.000Z",
-    updatedAt: "2025-10-06T09:25:00.000Z"
+    updatedAt: "2025-10-06T09:25:00.000Z",
   },
   {
     _id: "msg016",
     groupId: "grp101",
-    senderId: "usr006",
+    senderId: sampleUsers[5],
     text: "Agreed. Performance is better now.",
     attachment: [],
     type: "text",
     createdAt: "2025-10-06T09:26:00.000Z",
-    updatedAt: "2025-10-06T09:26:00.000Z"
+    updatedAt: "2025-10-06T09:26:00.000Z",
   },
   {
     _id: "msg017",
     groupId: "grp101",
-    senderId: "usr003",
+    senderId: sampleUsers[2],
     text: "Here’s a quick concept shot.",
     attachment: [
       {
         url: "https://images.unsplash.com/photo-1501594907352-04cda38ebc29",
-        fileType: "image"
-      }
+        fileType: "image",
+      },
     ],
     type: "media",
     createdAt: "2025-10-06T09:27:00.000Z",
-    updatedAt: "2025-10-06T09:27:00.000Z"
+    updatedAt: "2025-10-06T09:27:00.000Z",
   },
   {
     _id: "msg018",
     groupId: "grp101",
-    senderId: "68d417cc49cd55839387bc26",
+    senderId: sampleUsers[0],
     text: "Cool shot! Let’s use that in the cover slide.",
     attachment: [],
     type: "text",
     createdAt: "2025-10-06T09:28:00.000Z",
-    updatedAt: "2025-10-06T09:28:00.000Z"
+    updatedAt: "2025-10-06T09:28:00.000Z",
   },
   {
     _id: "msg019",
     groupId: "grp101",
-    senderId: "usr002",
+    senderId: sampleUsers[1],
     text: "Almost done preparing the report.",
     attachment: [],
     type: "text",
     createdAt: "2025-10-06T09:29:00.000Z",
-    updatedAt: "2025-10-06T09:29:00.000Z"
+    updatedAt: "2025-10-06T09:29:00.000Z",
   },
   {
     _id: "msg020",
     groupId: "grp101",
-    senderId: "usr005",
+    senderId: sampleUsers[4],
     text: "Uploading one more image for banner design.",
     attachment: [
       {
         url: "https://images.unsplash.com/photo-1498050108023-c5249f4df085",
-        fileType: "image"
-      }
+        fileType: "image",
+      },
     ],
     type: "media",
     createdAt: "2025-10-06T09:30:00.000Z",
-    updatedAt: "2025-10-06T09:30:00.000Z"
+    updatedAt: "2025-10-06T09:30:00.000Z",
   },
   {
     _id: "msg021",
     groupId: "grp101",
-    senderId: "usr006",
+    senderId: sampleUsers[5],
     text: "Got it, saving progress now.",
     attachment: [],
     type: "text",
     createdAt: "2025-10-06T09:31:00.000Z",
-    updatedAt: "2025-10-06T09:31:00.000Z"
+    updatedAt: "2025-10-06T09:31:00.000Z",
   },
   {
     _id: "msg022",
     groupId: "grp101",
-    senderId: "68d417cc49cd55839387bc26",
+    senderId: sampleUsers[0],
     text: "We’re almost ready for the demo session.",
     attachment: [],
     type: "text",
     createdAt: "2025-10-06T09:32:00.000Z",
-    updatedAt: "2025-10-06T09:32:00.000Z"
+    updatedAt: "2025-10-06T09:32:00.000Z",
   },
   {
     _id: "msg023",
     groupId: "grp101",
-    senderId: "usr002",
+    senderId: sampleUsers[1],
     text: "Should I prepare a short audio intro?",
     attachment: [],
     type: "text",
     createdAt: "2025-10-06T09:33:00.000Z",
-    updatedAt: "2025-10-06T09:33:00.000Z"
+    updatedAt: "2025-10-06T09:33:00.000Z",
   },
   {
     _id: "msg024",
     groupId: "grp101",
-    senderId: "usr004",
+    senderId: sampleUsers[3],
     text: "Sure, I’ll help with background track.",
     attachment: [
       {
         url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5.mp3",
-        fileType: "voice"
-      }
+        fileType: "voice",
+      },
     ],
     type: "voice",
     createdAt: "2025-10-06T09:34:00.000Z",
-    updatedAt: "2025-10-06T09:34:00.000Z"
+    updatedAt: "2025-10-06T09:34:00.000Z",
   },
   {
     _id: "msg025",
     groupId: "grp101",
-    senderId: "68d417cc49cd55839387bc26",
+    senderId: sampleUsers[0],
     text: "Perfect! That will sound great in the presentation.",
     attachment: [],
     type: "text",
     createdAt: "2025-10-06T09:35:00.000Z",
-    updatedAt: "2025-10-06T09:35:00.000Z"
+    updatedAt: "2025-10-06T09:35:00.000Z",
   },
   {
     _id: "msg026",
     groupId: "grp101",
-    senderId: "usr006",
+    senderId: sampleUsers[5],
     text: "Almost everything’s in place now.",
     attachment: [],
     type: "text",
     createdAt: "2025-10-06T09:36:00.000Z",
-    updatedAt: "2025-10-06T09:36:00.000Z"
+    updatedAt: "2025-10-06T09:36:00.000Z",
   },
   {
     _id: "msg027",
     groupId: "grp101",
-    senderId: "usr005",
+    senderId: sampleUsers[4],
     text: "Here’s a combo test with image and text.",
     attachment: [
       {
         url: "https://images.unsplash.com/photo-1536305030016-3e3b07a7b61a",
-        fileType: "image"
-      }
+        fileType: "image",
+      },
     ],
     type: "media",
     createdAt: "2025-10-06T09:37:00.000Z",
-    updatedAt: "2025-10-06T09:37:00.000Z"
+    updatedAt: "2025-10-06T09:37:00.000Z",
   },
   {
     _id: "msg028",
     groupId: "grp101",
-    senderId: "usr002",
+    senderId: sampleUsers[1],
     text: "Looks awesome. Great job, team!",
     attachment: [],
     type: "text",
     createdAt: "2025-10-06T09:38:00.000Z",
-    updatedAt: "2025-10-06T09:38:00.000Z"
+    updatedAt: "2025-10-06T09:38:00.000Z",
   },
   {
     _id: "msg029",
     groupId: "grp101",
-    senderId: "68d417cc49cd55839387bc26",
+    senderId: sampleUsers[0],
     text: "Let’s wrap up with the final sync later today.",
     attachment: [],
     type: "text",
     createdAt: "2025-10-06T09:39:00.000Z",
-    updatedAt: "2025-10-06T09:39:00.000Z"
+    updatedAt: "2025-10-06T09:39:00.000Z",
   },
   {
     _id: "msg030",
     groupId: "grp101",
-    senderId: "usr003",
+    senderId: sampleUsers[2],
     text: "All done! Great teamwork, everyone!",
     attachment: [],
     type: "text",
     createdAt: "2025-10-06T09:40:00.000Z",
-    updatedAt: "2025-10-06T09:40:00.000Z"
-  }
+    updatedAt: "2025-10-06T09:40:00.000Z",
+  },
 ];

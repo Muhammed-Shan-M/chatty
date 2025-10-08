@@ -1,3 +1,5 @@
+import type { User } from "./user"
+
 export interface GroupMessagesAttachment {
     url: string,
     fileType: 'image'|'voice'
@@ -5,7 +7,7 @@ export interface GroupMessagesAttachment {
 
 export interface GroupMessage {
     groupId: string
-    senderId:string
+    senderId:User
     text: string
     attachment: GroupMessagesAttachment[],
     type: string
@@ -16,3 +18,5 @@ export interface IGroupMessages extends GroupMessage {
     createdAt: string,
     updatedAt: string
 }
+
+

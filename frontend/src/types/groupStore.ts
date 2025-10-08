@@ -1,9 +1,10 @@
 
-import type { IGroup } from "./Group";
+import type { GroupWithoutPopulate, IGroup } from "./Group";
+
 
 
 export interface GroupStore {
-    groups: IGroup[],
+    groups: GroupWithoutPopulate[],
     isCreatingGroup: boolean
 
     groupInfo: IGroup | null
@@ -12,11 +13,12 @@ export interface GroupStore {
     showGroupInfo: boolean
 
     isGroupChat: boolean,
-    selectedGroup: IGroup | null,
+    selectedGroup: GroupWithoutPopulate | null,
 
     createGroup: (formData:FormData ) => Promise<void> 
     fecthGroups: () => Promise<void>
-    setSelectedGroup: (group: IGroup | null) => Promise<void>
+    setSelectedGroup: (group: GroupWithoutPopulate | null) => Promise<void>
     fetchGroupInfo: (groupId: string) => Promise<void>
     setShowGroupInfo: (val: boolean) => void
+    editGroupInfo:(data: FormData) => Promise<void>
 }

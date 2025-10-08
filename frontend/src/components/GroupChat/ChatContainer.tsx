@@ -19,10 +19,8 @@ export const ChatContainer = () => {
 
     if (showGroupInfo) {
         return (
-            <div className=" w-full bg-background p-4 overflow-auto">
-                <div className="container mx-auto p-4 md:p-6 lg:p-8">
-                    <GroupInfoPage />
-                </div>
+            <div className=" w-full bg-background p-1 overflow-auto">
+                <GroupInfoPage />
             </div>
         )
     }
@@ -41,21 +39,22 @@ export const ChatContainer = () => {
                 {messages.map((message) => (
                     <div
                         key={message._id}
-                        className={`chat ${message.senderId === authUser?._id ? "chat-end" : "chat-start"}`}
+                        className={`chat ${message.senderId._id === authUser?._id ? "chat-end" : "chat-start"}`}
                     >
                         <div className=" chat-image avatar">
                             <div className="size-10 rounded-full border">
                                 <img
                                     src={
-                                        message.senderId === authUser?._id
+                                        message?.senderId?._id === authUser?._id
                                             ? authUser.profile || "/avatar.png"
-                                            : message.senderId || "/avatar.png" // Todo: populated data here
+                                            : message.senderId.profile || "/avatar.png" // Todo: populated data here
                                     }
                                     alt="profile pic"
                                 />
                             </div>
                         </div>
                         <div className="chat-header mb-1">
+                            {message.senderId.userName}
                             <time className="text-xs opacity-50 ml-1">
                                 {formateTime(message.createdAt)}
                             </time>

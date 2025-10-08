@@ -15,3 +15,7 @@ export interface IGroup extends Group{
     createdAt: string,
     updatedAt: string
 }
+
+export interface GroupWithoutPopulate extends Omit<IGroup, "senderId">  {
+    senderId: string
+}

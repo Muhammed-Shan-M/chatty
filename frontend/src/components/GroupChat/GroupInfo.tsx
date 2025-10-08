@@ -1,22 +1,28 @@
 "use client"
-import { Pencil, Shield, Crown, UserPlus } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Badge } from "@/components/ui/badge"
+import { Shield, Crown, Plus, ShieldPlus, UserMinus, Search } from "lucide-react"
 import { useAuthStore } from "@/store/useAuthStore"
 import { useGroupStore } from "@/store/group"
+import { useState } from "react"
+import EditGroupModal from "../Modals/EditGroupInfoModal"
+import GroupInfoSkeleton from "../Skeleton/GroupInfoSkelton"
 
 export function GroupInfoPage() {
 
     const { authUser } = useAuthStore()
 
-    const { groupInfo } = useGroupStore()
+    const { groupInfo, setShowGroupInfo, isGroupInfoLoading } = useGroupStore()
+    const [memberQuery, setMemberQuery] = useState("")
+    const [isEditModalOpen, setisEditModalOpen] = useState(false)
 
 
 
     const onMakeAdmin = (memberId: string) => { }
-    const onEditGroup = () => { }
+
+
+    if (isGroupInfoLoading) {
+        return <GroupInfoSkeleton />
+    }
+
 
     const isAdmin = (() => {
         const adminSet = new Set(groupInfo?.admins);
@@ -33,142 +39,174 @@ export function GroupInfoPage() {
         return 0
     })
 
-    // const getInitials = (name: string) => {
-    //     return name
-    //         .split(" ")
-    //         .map((n) => n[0])
-    //         .join("")
-    //         .toUpperCase()
-    //         .slice(0, 2)
-    // }
 
     return (
-        <div className="flex flex-col gap-6">
-            {/* Group Info Section */}
-            <div className="rounded-lg border border-border bg-card p-4 sm:p-6">
-                <div className="flex flex-col sm:flex-row sm:items-start gap-4 sm:gap-6">
-                    {/* Group Avatar */}
-                    <Avatar className="w-full h-auto aspect-square rounded-none sm:w-32 sm:h-32 sm:rounded-full sm:shrink-0">
-                        <AvatarImage src={groupInfo?.avatar || "/placeholder.svg"} alt={groupInfo?.groupName} />
-                        {/* <AvatarFallback className="text-2xl md:text-3xl">{getInitials(groupInfo?.groupName!)}</AvatarFallback> */}
-                    </Avatar>
+        <div className="min-h-dvh bg-base-100 text-base-content ">
 
-                    {/* Group Details and Edit Button Container */}
-                    <div className="flex items-start justify-between gap-4 flex-1 min-w-0">
-                        {/* Group Details */}
-                        <div className="flex-1 min-w-0">
-                            <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-foreground mb-1 sm:mb-2 break-words">
-                                {groupInfo?.groupName}
-                            </h1>
-                            <p className="text-muted-foreground text-sm sm:text-base leading-relaxed break-words">
-                                {groupInfo?.description}
-                            </p>
+            {isEditModalOpen &&
+                <EditGroupModal
+                    open={isEditModalOpen}
+                    onClose={() => setisEditModalOpen(false)}
+                />}
+
+            {/* Top bar */}
+            <header className="navbar bg-base-100 sticky top-0 z-10 px-2">
+                <div className="navbar-start">
+                    <button type="button" aria-label="Back" className="btn btn-ghost btn-circle" onClick={() => setShowGroupInfo(false)}>
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="h-5 w-5"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                        >
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
+                        </svg>
+                    </button>
+                </div>
+                <div className="navbar-center" />
+                <div className="navbar-end">
+                    {currentUserIsAdmin && (
+                        <button className="btn btn-ghost btn-sm" onClick={() => setisEditModalOpen(true)}>
+                            Edit
+                        </button>
+                    )}
+                </div>
+            </header>
+
+            <main className="mx-auto px-4 pb-7 w-full max-w-2xl">
+                {/* Group header section */}
+                <section className="flex flex-col items-center text-center pt-4">
+                    <div className="avatar">
+                        <div className="w-24 rounded-full ring ring-primary ring-offset-2 ring-offset-base-100">
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img src={groupInfo?.avatar || "/placeholder-user.jpg"} alt={groupInfo?.groupName || "Group avatar"} />
                         </div>
-
-                        {/* Edit Button - Only visible to admins */}
-                        {currentUserIsAdmin && (
-                            <TooltipProvider>
-                                <Tooltip>
-                                    <TooltipTrigger asChild>
-                                        <Button variant="ghost" size="icon" onClick={onEditGroup} className="shrink-0 hover:bg-accent">
-                                            <Pencil className="h-4 w-4 sm:h-5 sm:w-5" />
-                                        </Button>
-                                    </TooltipTrigger>
-                                    <TooltipContent>
-                                        <p>Edit group info</p>
-                                    </TooltipContent>
-                                </Tooltip>
-                            </TooltipProvider>
-                        )}
                     </div>
+                    <h1 className="mt-3 text-xl font-semibold">{groupInfo?.groupName}</h1>
+                    {groupInfo?.description ? <p className="text-sm opacity-70">{groupInfo.description}</p> : null}
+                </section>
+
+                {/* Settings row replacement -> Add People (admins only) */}
+                {currentUserIsAdmin && (
+                    <section className="mt-5">
+                        <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                                <div className="badge badge-primary badge-xs" aria-hidden />
+                                <span className="text-sm font-medium">Group Actions</span>
+                            </div>
+                            <button
+                                className="btn btn-primary btn-sm gap-2"
+                            // onClick={onAddPeople /* You can implement: open add-people modal here */}
+                            >
+                                <Plus className="size-4" />
+                                <span className="hidden sm:inline">Add people</span>
+                            </button>
+                        </div>
+                    </section>
+                )}
+
+                {/* Members header */}
+                <h2 className="mt-6 mb-2 text-sm font-semibold opacity-70">
+                    People In The Room ({groupInfo?.members?.length ?? 0})
+                </h2>
+
+                <div className="mb-2">
+                    <label className="input input-bordered flex items-center gap-2 w-full" htmlFor="member-search">
+                        <Search className="size-4 opacity-70" aria-hidden />
+                        <input
+                            id="member-search"
+                            type="text"
+                            placeholder="Search members"
+                            className="grow"
+                            value={memberQuery}
+                            onChange={(e) => {
+                                // UI only: not filtering. Implement filtering in your app.
+                                // setMemberQuery(e.target.value)
+                            }}
+                        />
+                    </label>
                 </div>
-            </div>
 
-            {/* Members Section */}
-            <div className="rounded-lg border border-border bg-card overflow-hidden">
-                <div className="p-3 xs:p-4 border-b border-border">
-                    <h2 className="text-base xs:text-lg font-semibold text-foreground">Members ({groupInfo?.members.length})</h2>
-                </div>
-
-                {/* Members List with Scrollbar */}
-                <div className="max-h-[400px] overflow-y-auto">
-                    <div className="divide-y divide-border">
-                        {sortedMembers.map((member) => {
-                            const isMemberAdmin = isAdmin(member._id)
-                            const isOwner = groupInfo?.owner === member._id
-                            const isCurrentUser = member._id === authUser?._id
-
+                {/* Members list with fixed height + scrollbar */}
+                <section className="card bg-base-100 border border-base-300 mt-3">
+                    <div className="h-80 md:h-[60vh] overflow-y-auto p-3">
+                        {sortedMembers.map((m) => {
+                            const isOwner = groupInfo?.owner === m._id
+                            const admin = isAdmin(m._id)
+                            const isCurrentUser = m._id === authUser?._id
                             return (
-                                <div
-                                    key={member._id}
-                                    className="flex items-center justify-between gap-4 p-3 xs:p-4 hover:bg-accent/50 transition-colors"
-                                >
-                                    <div className="flex items-center gap-3 flex-1 min-w-0">
-                                        {/* Member Avatar */}
-                                        <Avatar className="h-9 w-9 xs:h-10 xs:w-10 shrink-0">
-                                            <AvatarImage src={member.profile || "/placeholder.svg"} alt={member.fullName} />
-                                            {/* <AvatarFallback>{getInitials(member.fullName)}</AvatarFallback> */}
-                                        </Avatar>
+                                <div key={m._id} className="sm:px-3">
+                                    <div className="flex px-2 rounded-lg items-center hover:bg-accent/15 gap-3 py-3 border-b border-base-300 last:border-b-0">
+                                        {/* avatar */}
+                                        <div className="avatar">
+                                            <div className="w-10 rounded-full">
+                                                {/* eslint-disable-next-line @next/next/no-img-element */}
+                                                <img src={m.profile || "/avatar.png"} alt={m.fullName} />
+                                            </div>
+                                        </div>
 
-                                        {/* Member Info */}
+                                        {/* main text + badges */}
                                         <div className="flex-1 min-w-0">
                                             <div className="flex items-center gap-2 flex-wrap">
-                                                <span className="font-medium text-foreground truncate text-sm xs:text-base">
-                                                    {isCurrentUser ? "You" : member.fullName}
-                                                </span>
-
-                                                {/* Owner Badge */}
+                                                <span className="font-medium truncate">{isCurrentUser ? "You" : m.fullName}</span>
                                                 {isOwner && (
-                                                    <Badge
-                                                        variant="secondary"
-                                                        className="gap-1 bg-amber-500/20 text-amber-600 dark:text-amber-400 border-amber-500/30 text-xs xs:text-sm"
-                                                    >
-                                                        <Crown className="h-3 w-3" />
-                                                        Owner
-                                                    </Badge>
+                                                    <span className="badge badge-warning badge-outline gap-1">
+                                                        <Crown className="size-3" />
+                                                        <span className="text-[11px]">Owner</span>
+                                                    </span>
                                                 )}
-
-                                                {/* Admin Badge */}
-                                                {isMemberAdmin && !isOwner && (
-                                                    <Badge
-                                                        variant="secondary"
-                                                        className="gap-1 bg-blue-500/20 text-blue-600 dark:text-blue-400 border-blue-500/30 text-xs xs:text-sm"
-                                                    >
-                                                        <Shield className="h-3 w-3" />
-                                                        Admin
-                                                    </Badge>
+                                                {!isOwner && admin && (
+                                                    <span className="badge badge-info badge-outline gap-1">
+                                                        <Shield className="size-3" />
+                                                        <span className="text-[11px]">Admin</span>
+                                                    </span>
                                                 )}
                                             </div>
                                         </div>
-                                    </div>
 
-                                    {/* Make Admin Button - Only visible to admins and not for current user */}
-                                    {currentUserIsAdmin && !isCurrentUser && !isMemberAdmin && (
-                                        <div className="flex-shrink-0 ml-2">
-                                            <TooltipProvider>
-                                                <Tooltip>
-                                                    <TooltipTrigger asChild>
-                                                        <Button
-                                                            variant="ghost"
-                                                            size="icon"
-                                                            onClick={() => onMakeAdmin(member._id)}
-                                                            className="hover:bg-accent"
-                                                        >
-                                                            <UserPlus className="h-4 w-4" />
-                                                        </Button>
-                                                    </TooltipTrigger>
-                                                    <TooltipContent>
-                                                        <p>Make admin</p>
-                                                    </TooltipContent>
-                                                </Tooltip>
-                                            </TooltipProvider>
-                                        </div>
-                                    )}
+                                        {currentUserIsAdmin && !isOwner && !isCurrentUser && (
+                                            <div className="flex items-center gap-1">
+                                                <button
+                                                    className="btn btn-ghost btn-xs text-error"
+                                                    title={`Remove ${m.fullName}`}
+                                                    aria-label={`Remove ${m.fullName}`}
+                                                    // Implement removal in your app:
+                                                    // onClick={() => onRemoveUser?.(m._id)}
+                                                    type="button"
+                                                >
+                                                    <UserMinus className="size-4" />
+                                                </button>
+
+
+                                                {!admin && (
+                                                    <button
+                                                        className="btn btn-ghost btn-xs text-warning"
+                                                        title={`Make ${m.fullName} admin`}
+                                                        aria-label={`Make ${m.fullName} admin`}
+                                                        // Implement promotion in your app:
+                                                        // onClick={() => onMakeAdmin?.(m._id)}
+                                                        type="button"
+                                                    >
+                                                        <ShieldPlus className="size-4" />
+                                                    </button>
+                                                )}
+                                            </div>
+                                        )}
+                                    </div>
                                 </div>
                             )
                         })}
                     </div>
-                </div>
+                </section>
+            </main>
+
+            <div className="h-16 px-3 bg-base-100 border-base-300 flex items-center">
+                <button className="btn btn-error btn-outline [@media(min-width:800px)]:w-[640px] w-full mx-auto"
+                // onClick={onLeaveGroup}
+                >
+                    Leave Group
+                </button>
             </div>
         </div>
     )

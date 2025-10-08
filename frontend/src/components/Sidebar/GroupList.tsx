@@ -1,9 +1,11 @@
+
+import type { GroupWithoutPopulate } from '@/types/Group';
 import { useGroupStore } from '../../store/group';
 import { useAuthStore } from '../../store/useAuthStore';
-import type { IGroup } from '../../types/Group';
+
 
 interface GroupListItemProps {
-    group: IGroup;
+    group: GroupWithoutPopulate;
     // selectedGroup?: IGroup | null;
     // add other props like chatData if needed
 }
@@ -29,7 +31,7 @@ export const GroupList = ({ group }: GroupListItemProps) => {
 
             <div className={`relative flex-shrink-0 ${showUserInfo ? "" : "mx-auto"}`}>
                 <img
-                    src={group.avatar || "/avatar.png"}
+                    src={group.avatar || "/group-avatar.png"}
                     alt={group.groupName}
                     className="size-12 object-cover rounded-full"
                 />

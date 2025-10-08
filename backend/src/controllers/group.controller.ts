@@ -40,13 +40,13 @@ export const createGroup = async (req: Request, res: Response, next: NextFunctio
 
 export const editGroupInfo = async (req:Request, res: Response, next: NextFunction) => {
     try {
-        const {description} = req.body
+        const {description,groupName} = req.body
         const avatar = req.file
         const groupId = req.params.id
         const userId = req.user?._id
 
 
-        if(!description || !avatar) throw new AppError('You must provide either a description or an avatar to update group information.', 400)
+        if(!description && !groupName && !avatar) throw new AppError('Please provide at least a group name, description, or avatar to update the group information.', 400)
         if(!userId) throw new AppError('The specified user does not exist.', 401)
 
         let avatarUrl 
@@ -57,10 +57,11 @@ export const editGroupInfo = async (req:Request, res: Response, next: NextFuncti
 
         const updatedGroupInfo = await Group.findByIdAndUpdate(groupId, 
             {$set: {
+                groupName,
                 description, 
                 avatar: avatarUrl
             }}, {new: true}
-        )
+        ).populate('members')
 
         res.status(200).json(updatedGroupInfo)
     } catch (error) {
@@ -92,7 +93,7 @@ export const getuserGroup = async (req:Request, res: Response, next: NextFunctio
 
         if(!userId)throw new AppError('The specified user does not exist.', 401)
 
-        const groups = await Group.find({members: userId}).populate('members')
+        const groups = await Group.find({members: userId})
 
         console.log(groups)
 
