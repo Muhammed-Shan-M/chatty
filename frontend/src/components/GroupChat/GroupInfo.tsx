@@ -1,22 +1,39 @@
 "use client"
-import { Shield, Crown, Plus, ShieldPlus, UserMinus, Search } from "lucide-react"
+import { Shield, Crown, Plus, ShieldPlus, UserMinus, Search, ShieldMinus, EllipsisVertical } from "lucide-react"
 import { useAuthStore } from "@/store/useAuthStore"
 import { useGroupStore } from "@/store/group"
-import { useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import EditGroupModal from "../Modals/EditGroupInfoModal"
 import GroupInfoSkeleton from "../Skeleton/GroupInfoSkelton"
+import { AddMembersModal } from "../Modals/AddUserModal"
+import { ConfirmationModal } from "../alertModals/confirmationModal"
+import type { Purpose } from "@/types/Purpose"
+
+
 
 export function GroupInfoPage() {
 
     const { authUser } = useAuthStore()
 
-    const { groupInfo, setShowGroupInfo, isGroupInfoLoading } = useGroupStore()
+    const { groupInfo, setShowGroupInfo, isGroupInfoLoading, removeMember, putAsAdmin, removeAdmin } = useGroupStore()
     const [memberQuery, setMemberQuery] = useState("")
     const [isEditModalOpen, setisEditModalOpen] = useState(false)
 
+    const [openAddPepole, setOpenAddPepole] = useState(false)
+
+    const [isConfirmation, setIsConfirmation] = useState(false)
+    const [currentuserId, setCurrentUserId] = useState('')
+    const [confirmatioPurpose, setConfirmationPurpose] = useState<Purpose>('')
 
 
-    const onMakeAdmin = (memberId: string) => { }
+    const [showBioFull, setShowBioFull] = useState(false)
+    const bioref = useRef<HTMLDivElement | null>(null)
+    const bio = showBioFull ? groupInfo?.description : groupInfo?.description.slice(0, 200)
+    useEffect(() => {
+        if (bioref.current) {
+            bioref.current.scrollIntoView({ behavior: 'smooth' })
+        }
+    }, [showBioFull])
 
 
     if (isGroupInfoLoading) {
@@ -39,6 +56,26 @@ export function GroupInfoPage() {
         return 0
     })
 
+    const handleUserOP = (purpose: Purpose, id: string) => {
+        setIsConfirmation(true)
+        setCurrentUserId(id)
+        setConfirmationPurpose(purpose)
+    }
+
+    const handleConfirm = async () => {
+        setIsConfirmation(false)
+
+        if (confirmatioPurpose === 'put-as-admin') {
+            await putAsAdmin(currentuserId)
+        } else if (confirmatioPurpose === 'remove-as-admin') {
+            await removeAdmin(currentuserId)
+        } else if (confirmatioPurpose === 'remove-user') {
+            await removeMember(currentuserId)
+        }
+
+        setCurrentUserId('')
+    }
+
 
     return (
         <div className="min-h-dvh bg-base-100 text-base-content ">
@@ -48,6 +85,16 @@ export function GroupInfoPage() {
                     open={isEditModalOpen}
                     onClose={() => setisEditModalOpen(false)}
                 />}
+
+            {openAddPepole &&
+                <AddMembersModal open={openAddPepole} onClose={() => setOpenAddPepole(false)} />
+            }
+
+            <ConfirmationModal
+                onclose={() => setIsConfirmation(false)}
+                open={isConfirmation}
+                handleConfirm={handleConfirm}
+                purpose={confirmatioPurpose} />
 
             {/* Top bar */}
             <header className="navbar bg-base-100 sticky top-0 z-10 px-2">
@@ -76,7 +123,7 @@ export function GroupInfoPage() {
 
             <main className="mx-auto px-4 pb-7 w-full max-w-2xl">
                 {/* Group header section */}
-                <section className="flex flex-col items-center text-center pt-4">
+                <section className="mb-5 flex flex-col items-center text-center pt-4">
                     <div className="avatar">
                         <div className="w-24 rounded-full ring ring-primary ring-offset-2 ring-offset-base-100">
                             {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -84,7 +131,16 @@ export function GroupInfoPage() {
                         </div>
                     </div>
                     <h1 className="mt-3 text-xl font-semibold">{groupInfo?.groupName}</h1>
-                    {groupInfo?.description ? <p className="text-sm opacity-70">{groupInfo.description}</p> : null}
+                    {groupInfo?.description ?
+                        <div
+                            className="mt-2 text-sm opacity-70 whitespace-pre-wrap text-left"
+                        >
+                            {bio}
+                            <button onClick={() => setShowBioFull(!showBioFull)}
+                                className="text-sm text-primary hover:underline">{showBioFull ? ' See Less' : ' ..See More'}</button>
+                        </div>
+
+                        : null}
                 </section>
 
                 {/* Settings row replacement -> Add People (admins only) */}
@@ -97,7 +153,7 @@ export function GroupInfoPage() {
                             </div>
                             <button
                                 className="btn btn-primary btn-sm gap-2"
-                            // onClick={onAddPeople /* You can implement: open add-people modal here */}
+                                onClick={() => setOpenAddPepole(true)}
                             >
                                 <Plus className="size-4" />
                                 <span className="hidden sm:inline">Add people</span>
@@ -149,7 +205,7 @@ export function GroupInfoPage() {
                                         {/* main text + badges */}
                                         <div className="flex-1 min-w-0">
                                             <div className="flex items-center gap-2 flex-wrap">
-                                                <span className="font-medium truncate">{isCurrentUser ? "You" : m.fullName}</span>
+                                                <span className="font-medium truncate">{isCurrentUser ? "You" : m.userName}</span>
                                                 {isOwner && (
                                                     <span className="badge badge-warning badge-outline gap-1">
                                                         <Crown className="size-3" />
@@ -165,18 +221,71 @@ export function GroupInfoPage() {
                                             </div>
                                         </div>
 
+
                                         {currentUserIsAdmin && !isOwner && !isCurrentUser && (
-                                            <div className="flex items-center gap-1">
+                                            <>
+                                                <button className="block sm:hidden" popoverTarget={`popover-${m._id}`} style={{ anchorName: `--anchor-${m._id}` } as React.CSSProperties}>
+                                                    <EllipsisVertical />
+                                                </button>
+
+                                                <ul className="dropdown dropdown-end menu w-52 rounded-box bg-base-100 shadow-sm"
+                                                    popover="auto" id={`popover-${m._id}`} style={{ positionAnchor: `--anchor-${m._id}` } as React.CSSProperties}
+                                                    >
+                                                    {!admin &&
+                                                        <li>
+                                                            <a
+                                                                onClick={() => {
+                                                                    document.getElementById(`popover-${m._id}`)?.hidePopover();
+                                                                    handleUserOP('put-as-admin', m._id)
+                                                                }}
+                                                            ><ShieldPlus className="size-4" /> Make Admin</a>
+                                                        </li>}
+                                                    {admin &&
+                                                        <li>
+                                                            <a
+                                                                onClick={() => {
+                                                                    document.getElementById(`popover-${m._id}`)?.hidePopover();
+                                                                    handleUserOP('remove-as-admin', m._id)
+                                                                }}
+                                                            ><ShieldMinus className="size-4" /> Remove Admin</a>
+                                                        </li>}
+                                                    <li>
+                                                        <a
+                                                            onClick={() => {
+                                                                document.getElementById(`popover-${m._id}`)?.hidePopover();
+                                                                handleUserOP('remove-user', m._id)
+                                                            }}
+                                                        ><UserMinus className="size-4" /> Remove User</a>
+                                                    </li>
+                                                </ul>
+                                            </>
+                                        )}
+
+
+
+                                        {currentUserIsAdmin && !isOwner && !isCurrentUser && (
+                                            <div className="hidden sm:flex items-center gap-1">
                                                 <button
                                                     className="btn btn-ghost btn-xs text-error"
                                                     title={`Remove ${m.fullName}`}
                                                     aria-label={`Remove ${m.fullName}`}
-                                                    // Implement removal in your app:
-                                                    // onClick={() => onRemoveUser?.(m._id)}
+                                                    onClick={() => handleUserOP("remove-user", m._id)}
                                                     type="button"
                                                 >
                                                     <UserMinus className="size-4" />
                                                 </button>
+
+                                                {admin && (
+                                                    <button
+                                                        className="btn btn-ghost btn-xs text-error"
+                                                        title={`Remove ${m.userName} as admin`}
+                                                        aria-label={`Remove ${m.userName} as admin`}
+                                                        onClick={() => handleUserOP('remove-as-admin', m._id)}
+                                                        type="button"
+                                                    >
+                                                        <ShieldMinus className="size-4" />
+                                                    </button>
+                                                )}
 
 
                                                 {!admin && (
@@ -184,8 +293,7 @@ export function GroupInfoPage() {
                                                         className="btn btn-ghost btn-xs text-warning"
                                                         title={`Make ${m.fullName} admin`}
                                                         aria-label={`Make ${m.fullName} admin`}
-                                                        // Implement promotion in your app:
-                                                        // onClick={() => onMakeAdmin?.(m._id)}
+                                                        onClick={() => handleUserOP('put-as-admin', m._id)}
                                                         type="button"
                                                     >
                                                         <ShieldPlus className="size-4" />

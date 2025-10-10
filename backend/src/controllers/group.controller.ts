@@ -2,6 +2,8 @@ import type { NextFunction, Request, Response } from "express"
 import { AppError } from "../errors/appError.errors.ts"
 import Group from "../models/groups.model.ts"
 import { uploadToCloudinary } from "../utility/cloudinaryuploader.utility.ts"
+import User from "../models/user.model.ts"
+import mongoose from "mongoose"
 
 
 export const createGroup = async (req: Request, res: Response, next: NextFunction) => {
@@ -95,8 +97,6 @@ export const getuserGroup = async (req:Request, res: Response, next: NextFunctio
 
         const groups = await Group.find({members: userId})
 
-        console.log(groups)
-
         res.status(200).json(groups)
     } catch (error) {
         next(error)
@@ -108,14 +108,16 @@ export const getuserGroup = async (req:Request, res: Response, next: NextFunctio
 export const putAsAdmin = async (req:Request, res: Response, next: NextFunction) => {
     try {
         const groupId = req.params.id
-        const userId = req.body.userId
+        const userId = req.body.userId as string
+
+        const memberId = new mongoose.Types.ObjectId(userId)
 
         if(!userId || !groupId)throw new AppError('The specified user or group does not exist.', 401)
         
-        const updatedGroup = Group.findByIdAndUpdate(groupId,
-            {$push: {members: userId}},
+        const updatedGroup = await Group.findByIdAndUpdate(groupId,
+            {$addToSet: {admins: memberId}},
             {new: true}
-        )
+        ).populate('members')
 
         res.status(200).json(updatedGroup)
     } catch (error) {
@@ -127,14 +129,16 @@ export const putAsAdmin = async (req:Request, res: Response, next: NextFunction)
 export const removeFromeAdmin = async (req:Request, res:Response, next:NextFunction) => {
     try {
         const userId = req.body.userId
-        const groupId = req.params.id
+        const groupId = req.params.id as string
+
+        const memberId = new mongoose.Types.ObjectId(userId)
 
         if(!userId || !groupId)throw new AppError('The specified user or group does not exist.', 401)
 
         const updatedGroup = await Group.findByIdAndUpdate(groupId, 
-            {$pull: {admins: userId}},
+            {$pull: {admins: memberId}},
             {new: true}
-        )
+        ).populate('members')
 
         res.status(200).json(updatedGroup)
 
@@ -144,17 +148,19 @@ export const removeFromeAdmin = async (req:Request, res:Response, next:NextFunct
 }
 
 
-export const addMember = async (req:Request, res:Response, next:NextFunction) => {
+export const addMembers = async (req:Request, res:Response, next:NextFunction) => {
     try {
-        const userId = req.body.userId
+        const members = req.body.members
         const groupId = req.params.id
 
-        if(!userId || !groupId)throw new AppError('The specified user or group does not exist.', 401)
+        const membersIds = members.map((id:string) => new mongoose.Types.ObjectId(id))
+
+        if(!members.length || !groupId)throw new AppError('The specified user or group does not exist.', 401)
 
         const updatedGroup = await Group.findByIdAndUpdate(groupId, 
-            {$push: {members: userId}},
+            {$addToSet: {members:{$each: members}}},
             {new: true}
-        )
+        ).populate('members')
 
         res.status(200).json(updatedGroup)
 
@@ -174,7 +180,7 @@ export const removeMember = async (req:Request, res:Response, next:NextFunction)
         const updatedGroup = await Group.findByIdAndUpdate(groupId, 
             {$pull: {members: userId}},
             {new: true}
-        )
+        ).populate('members')
 
         res.status(200).json(updatedGroup)
 
@@ -182,3 +188,19 @@ export const removeMember = async (req:Request, res:Response, next:NextFunction)
         next(error)
     }
 }
+
+
+export const getUsers = async (req:Request, res:Response, next:NextFunction) => {
+    try {
+        const gropid  = req.params.id
+
+        const group = await Group.findById(gropid)
+
+        const previousMembers = group?.members
+        const members = await User.find({_id:{$nin: previousMembers}})
+
+        res.status(200).json(members)
+    } catch (error) {
+        next(error)
+    }
+} 

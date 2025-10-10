@@ -73,5 +73,55 @@ export const useGroupStore = create<GroupStore>((set,get) => ({
         } finally {
             set({isGroupInfoLoading: false})
         }
+    },
+
+    addMembers: async (members) => {
+        set({isGroupInfoLoading: true})
+        try {
+            const res = await axiosInstance.patch(`/group/add-members/${get().selectedGroup?._id}`, {members})
+            console.log('from backend res : ',res.data)
+            set({groupInfo: res.data})
+        } catch (error) {
+            errorHandler(error)
+        } finally {
+            set({isGroupInfoLoading: false})
+        }
+    },
+
+    removeMember:async (userId) => {
+        set({isGroupInfoLoading: true})
+        try {
+            const res = await axiosInstance.patch(`/group/remove-a-member/${get().selectedGroup?._id}`,{userId})
+            set({groupInfo: res.data})
+        } catch (error) {
+            errorHandler(error)
+        }finally {
+            set({isGroupInfoLoading: false})
+        }
+    },
+
+    putAsAdmin: async (userId) => {
+        set({isGroupInfoLoading:true})
+        try {
+            const res = await axiosInstance.patch(`/group/put-as-admin/${get().selectedGroup?._id}`,{userId})
+            set({groupInfo:res.data})
+        } catch (error) {
+            errorHandler(error)
+        } finally {
+            set({isGroupInfoLoading: false})
+        }
+    },
+
+    removeAdmin: async (userId) => {
+        set({isGroupInfoLoading: true})
+        try {
+            const res = await axiosInstance.patch(`/group/remove-a-admin/${get().selectedGroup?._id}`,{userId})
+            set({groupInfo: res.data})
+        } catch (error) {
+            errorHandler(error)
+        } finally {
+            set({isGroupInfoLoading: false})
+        }
     }
-}))
+
+ }))

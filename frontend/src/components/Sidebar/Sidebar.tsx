@@ -45,6 +45,7 @@ export const Sidebar = ({ cbForModal }: { cbForModal: () => void }) => {
     )
 
 
+
     const [showOnlineOnly, setShowOnlineOnly] = useState(false);
     const [sortedUsers, setSortedUsers] = useState<User[] | null>(null)
     const [showGroups, setShowGroups] = useState(true)

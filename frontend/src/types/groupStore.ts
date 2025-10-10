@@ -21,4 +21,8 @@ export interface GroupStore {
     fetchGroupInfo: (groupId: string) => Promise<void>
     setShowGroupInfo: (val: boolean) => void
     editGroupInfo:(data: FormData) => Promise<void>
+    addMembers:(members:string[]) => Promise<void>
+    removeMember: (userId: string) => Promise<void>
+    putAsAdmin: (userId: string) => Promise<void>
+    removeAdmin: (userId: string) => Promise<void>
 }

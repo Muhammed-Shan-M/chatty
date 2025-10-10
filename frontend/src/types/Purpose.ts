@@ -1,0 +1,1 @@
+export type Purpose = 'put-as-admin' | 'remove-user' | 'remove-as-admin' | ''

@@ -101,7 +101,6 @@ export const sendVoiceMessage = async (req: Request, res: Response, next: NextFu
         const voice = files.voice
         const image = files.image
 
-        console.log(voice,image)
 
         if(!voice && !image)throw new AppError('No audio file uploaded. Please provide an audio file.', 400)
 
@@ -157,7 +156,6 @@ export const sendVoiceMessage = async (req: Request, res: Response, next: NextFu
 export const getUnreadMessages = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const userId = new mongoose.Types.ObjectId(req.params.id)
-        console.log(userId)
 
         const converstaions = await Message.aggregate([
             { $match: {  reciverId: userId , isRead: false } },
@@ -193,3 +191,6 @@ export const markAsRead = async (req: Request, res: Response, next: NextFunction
         next(error)
     }
 }
+
+
+// Todo : send realtime message for add members , remove members , edit group info, make admin 

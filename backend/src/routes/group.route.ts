@@ -1,6 +1,6 @@
 import express from 'express'
 import { protectedRoute } from '../middleware/auth.middleware.ts'
-import { addMember, createGroup, editGroupInfo, fecthGroupInfo, getuserGroup, putAsAdmin, removeFromeAdmin, removeMember } from '../controllers/group.controller.ts'
+import { addMembers, createGroup, editGroupInfo, fecthGroupInfo, getuserGroup, getUsers, putAsAdmin, removeFromeAdmin, removeMember } from '../controllers/group.controller.ts'
 import { isAdmin } from '../middleware/isAdmin.middleware.ts'
 import upload from '../middleware/multer.ts'
 
@@ -17,8 +17,9 @@ route.get('/get-users-group',protectedRoute,getuserGroup)
 route.patch('/put-as-admin/:id',protectedRoute,isAdmin,putAsAdmin)
 route.patch('/remove-a-admin/:id',protectedRoute,isAdmin,removeFromeAdmin)
 
-route.patch('/add-a-member/:id',protectedRoute,isAdmin,addMember)
+route.patch('/add-members/:id',protectedRoute,isAdmin,addMembers)
 route.patch('/remove-a-member/:id',protectedRoute,isAdmin,removeMember)
+route.get('/get-users/:id', protectedRoute, getUsers)
 
 
 export default route
