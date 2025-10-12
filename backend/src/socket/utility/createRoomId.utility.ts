@@ -1,0 +1,1 @@
+export const createRoomId = (groupId: string) => `group-${groupId}`

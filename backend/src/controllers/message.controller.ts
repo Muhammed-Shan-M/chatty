@@ -3,10 +3,11 @@ import User from "../models/user.model.ts"
 import Message from "../models/message.model.ts"
 import { AppError } from "../errors/appError.errors.ts"
 import { uploadToCloudinary } from "../utility/cloudinaryuploader.utility.ts"
-import { getReciverSocketId, io } from "../socket/socket.ts"
+import { io } from "../socket/socket.ts"
 import { buildPreview } from "../utility/buidePreview.ts"
 import mongoose from "mongoose"
 import { findChatId } from "../utility/findChatId.ts"
+import { getReciverSocketId } from "../socket/utility/getReciverSocketId.utility.ts"
 
 
 

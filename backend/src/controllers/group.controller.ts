@@ -204,3 +204,7 @@ export const getUsers = async (req:Request, res:Response, next:NextFunction) => 
         next(error)
     }
 } 
+
+
+
+// Todo : not done leave group | exit group from group , add it after group message finish

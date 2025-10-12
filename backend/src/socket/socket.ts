@@ -1,6 +1,7 @@
 import { Server } from "socket.io";
 import http from 'http'
 import express from 'express'
+import { registerSocketEvent } from "./socketEvent.ts";
 
 
 const app = express()
@@ -8,36 +9,20 @@ const server = http.createServer(app)
 
 const FRONTEND_URL = process.env.FRONTEND_URL as string
 
+const io = initSocket()
 
-const io = new Server(server, {
-    cors:{
-        origin: [FRONTEND_URL]
-    }
-})
+function initSocket() {
+    const io = new Server(server, {
+        cors: {
+            origin: [FRONTEND_URL]
+        }
+    })
 
+    registerSocketEvent(io)
+    console.log('socket connected')
 
-export function getReciverSocketId(reciverId: string) {
-    return usersSocketMap[reciverId]
+    return io
 }
 
-const usersSocketMap:Record<string,string> = {}
 
-
-io.on('connection', (socket) => {
-    console.log('a user connected', socket.id)
-
-    const userId = socket.handshake.query.userId as string
-    if(userId) usersSocketMap[userId] = socket.id
-
-    io.emit('getOnlineUsers',Object.keys(usersSocketMap))
-
-
-    socket.on('disconnect', () => {
-        console.log('a user disconnected : ', socket.id)
-        delete usersSocketMap[userId]
-        io.emit('getOnlineUsers',Object.keys(usersSocketMap))
-    })
-})
-
-
-export {io, server, app}
+export { io, server, app }
