@@ -7,7 +7,7 @@ import groupRoute from './routes/group.route.ts'
 import { connectDB } from './lib/db.ts'
 import { errorHandler } from './middleware/error.middleware.ts'
 import cors from 'cors'
-import { app, server } from './lib/socket.ts'
+import { app, server } from './socket/socket.ts'
 
 dotenv.config()
 

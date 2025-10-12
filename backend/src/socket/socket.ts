@@ -7,7 +7,7 @@ const app = express()
 const server = http.createServer(app)
 
 const FRONTEND_URL = process.env.FRONTEND_URL as string
-console.log('url',FRONTEND_URL )
+
 
 const io = new Server(server, {
     cors:{
@@ -23,7 +23,6 @@ export function getReciverSocketId(reciverId: string) {
 const usersSocketMap:Record<string,string> = {}
 
 
-
 io.on('connection', (socket) => {
     console.log('a user connected', socket.id)
 
@@ -31,6 +30,7 @@ io.on('connection', (socket) => {
     if(userId) usersSocketMap[userId] = socket.id
 
     io.emit('getOnlineUsers',Object.keys(usersSocketMap))
+
 
     socket.on('disconnect', () => {
         console.log('a user disconnected : ', socket.id)
