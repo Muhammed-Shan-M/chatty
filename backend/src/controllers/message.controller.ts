@@ -8,6 +8,8 @@ import { buildPreview } from "../utility/buidePreview.ts"
 import mongoose from "mongoose"
 import { findChatId } from "../utility/findChatId.ts"
 import { getReciverSocketId } from "../socket/utility/getReciverSocketId.utility.ts"
+import { emiteNewMessage } from "../socket/emiter/sendMessage.emiter.ts"
+import { emiteNotification } from "../socket/emiter/notification.emiter.ts"
 
 
 
@@ -76,16 +78,9 @@ export const sendMessage = async (req: Request, res: Response, next: NextFunctio
 
 
         const reciverSocketId = getReciverSocketId(reciverId!)
-
-        if (reciverSocketId) {
-            io.to(reciverSocketId).emit('newMessages', newMessage)
-            io.to(reciverSocketId).emit('notifyUser', {
-                messageId: newMessage._id,
-                senderId: newMessage.senderId,
-                timeStamp: newMessage.createdAt,
-                senderUserName: req.user?.userName,
-                preview: newMessage.preview
-            })
+        if(reciverSocketId) {
+            emiteNewMessage(reciverSocketId, newMessage)
+            emiteNotification(reciverSocketId, newMessage, req.user?.userName!)
         }
 
         res.status(201).json(newMessage)
@@ -134,15 +129,9 @@ export const sendVoiceMessage = async (req: Request, res: Response, next: NextFu
         await newMessage.save()
 
         const reciverSocketId = getReciverSocketId(reciverId!)
-        if (reciverSocketId) {
-            io.to(reciverSocketId).emit('newMessages', newMessage)
-            io.to(reciverSocketId).emit('notifyUser', {
-                messageId: newMessage._id,
-                senderId: newMessage.senderId,
-                timeStamp: newMessage.createdAt,
-                senderUserName: req.user?.userName,
-                preview: newMessage.preview
-            })
+        if(reciverSocketId) {
+            emiteNewMessage(reciverSocketId, newMessage)
+            emiteNotification(reciverSocketId, newMessage, req.user?.userName!)
         }
 
 

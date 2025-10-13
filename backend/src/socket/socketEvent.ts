@@ -2,7 +2,6 @@ import type { Server } from "socket.io"
 import { disconnect } from "./handlers/connection.handlers.ts"
 import { usersSocketMap } from "./State/socketState.ts"
 import { groupHandler } from "./handlers/group.handler.ts"
-import { groupMessageHandler } from "./handlers/groupMessage.handler.ts"
 
 export const registerSocketEvent = (io: Server) => {
     io.on('connection', (socket) => {
@@ -15,7 +14,6 @@ export const registerSocketEvent = (io: Server) => {
 
 
         disconnect(io,socket)
-        groupMessageHandler(io, socket)
         groupHandler(io, socket)
     })
 } 

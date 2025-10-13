@@ -8,7 +8,7 @@ const groupMessageSchema = new mongoose.Schema<IGroupMessages>(
         groupId:{type: Schema.ObjectId,ref: 'Group', require: true },
         senderId: {type: Schema.ObjectId,ref: 'User', require: true },
         text:{type: String},
-        attachment: [
+        attachments: [
             {
                 url: {type: String,require: true},
                 fileType: {type: String,enum:['image','voice'] ,require: true}

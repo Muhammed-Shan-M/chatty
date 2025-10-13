@@ -10,7 +10,7 @@ export interface GroupMessage {
     groupId: Types.ObjectId
     senderId:Types.ObjectId
     text: string
-    attachment: GroupMessagesAttachment[],
+    attachments: GroupMessagesAttachment[],
     type: string
 }
 
