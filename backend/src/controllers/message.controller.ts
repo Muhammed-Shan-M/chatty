@@ -97,7 +97,6 @@ export const sendVoiceMessage = async (req: Request, res: Response, next: NextFu
         const voice = files.voice
         const image = files.image
 
-
         if(!voice && !image)throw new AppError('No audio file uploaded. Please provide an audio file.', 400)
 
         const reciverId = req.params.id
