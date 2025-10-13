@@ -4,6 +4,7 @@ import cookieParser from 'cookie-parser'
 import authRouts from './routes/auth.route.ts'
 import messageRoute from './routes/message.route.ts'
 import groupRoute from './routes/group.route.ts'
+import groupMessageRoute from './routes/groupMessage.route.ts'
 import { connectDB } from './lib/db.ts'
 import { errorHandler } from './middleware/error.middleware.ts'
 import cors from 'cors'
@@ -23,6 +24,7 @@ app.use(cors({
 app.use('/api/auth', authRouts)
 app.use('/api/messages', messageRoute)
 app.use('/api/group', groupRoute)
+app.use('/api/group-message',groupMessageRoute)
 
 
 app.use(errorHandler)
