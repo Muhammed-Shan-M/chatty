@@ -6,16 +6,21 @@ import { formateTime } from '../../utility/formateTime'
 import { AudioPlayer } from '../Helpingcomponents/AudioPlayerProps'
 import { useGroupStore } from '../../store/group'
 import { getStartMessage } from '../../utility/getWelcomeMessage'
-import { sampleGroupMessages as messages } from '../../constants/GroupMessas'
 import { GroupInfoPage } from './GroupInfo'
+import { useGroupChatStore } from '@/store/groupChatStore'
+import { useEffect } from 'react'
 
 
 export const ChatContainer = () => {
 
-
     const { authUser } = useAuthStore()
-    const { selectedGroup } = useGroupStore()
-    const { showGroupInfo, setShowGroupInfo } = useGroupStore()
+    const { groupMessages: messages, getMessages } = useGroupChatStore()
+    const { showGroupInfo, selectedGroup } = useGroupStore()
+
+    useEffect(() => {
+        getMessages()
+
+    }, [getMessages])
 
     if (showGroupInfo) {
         return (
@@ -25,6 +30,8 @@ export const ChatContainer = () => {
         )
     }
 
+    
+    
     const welcomeText = getStartMessage(selectedGroup!, authUser?._id!)
 
     return (
@@ -45,7 +52,7 @@ export const ChatContainer = () => {
                             <div className="size-10 rounded-full border">
                                 <img
                                     src={
-                                        message?.senderId?._id === authUser?._id
+                                        message?.senderId._id === authUser?._id
                                             ? authUser.profile || "/avatar.png"
                                             : message.senderId.profile || "/avatar.png" // Todo: populated data here
                                     }
@@ -60,9 +67,9 @@ export const ChatContainer = () => {
                             </time>
                         </div>
                         <div className="chat-bubble flex flex-col">
-                            {message.attachment && message.attachment.length > 0 && (
+                            {message.attachments && message.attachments.length > 0 && (
                                 <>
-                                    {message.attachment.map((file, index) => (
+                                    {message.attachments.map((file, index) => (
                                         file.fileType === 'image' ? (
                                             <img
                                                 key={index}
@@ -72,7 +79,7 @@ export const ChatContainer = () => {
                                             />
                                         ) : file.fileType === 'voice' ? (
                                             <AudioPlayer key={index} src={file.url} />
-                                        ) : null
+                                        ) : null  
                                     ))}
                                 </>
                             )}

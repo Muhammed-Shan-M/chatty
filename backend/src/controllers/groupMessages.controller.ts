@@ -6,6 +6,7 @@ import { emiteNewGroupMessage } from "../socket/emiter/sendGroupMessage.emite.ts
 import Group from "../models/groups.model.ts";
 import { createRoomId } from "../socket/utility/createRoomId.utility.ts";
 import { emiteGroupNotification } from "../socket/emiter/notificationGroupMessage.emiter.ts";
+import mongoose from "mongoose";
 
 export interface MulterMessageRequst {
     image?: Express.Multer.File[],
@@ -28,9 +29,7 @@ export const sendMessage = async (req: Request, res: Response, next: NextFunctio
         const group = await Group.findById(groupId).select('members')
         if (!group) throw new AppError('The specified group does not exist.', 404)
         
-
-        const isMember = group.members.find((id) => id === senderId)
-        if(!isMember)throw new AppError('You are not a member of this group.', 403)
+        if(!group.members.includes(senderId))throw new AppError('You are not a member of this group.', 403)
 
         
         const attachments: { url: string, fileType: 'image' | 'voice' }[] = []
@@ -58,13 +57,15 @@ export const sendMessage = async (req: Request, res: Response, next: NextFunctio
                         : 'text';
 
 
-        const newMessage = new GroupMessages({
+        const newMessage = await new GroupMessages({
             groupId,
             senderId,
             text,
             attachments,
             type,
-        })
+        }).populate('senderId')
+
+        await newMessage.save()
 
         const groupMembers = group.members.map((id) => id.toString())
         const roomId = createRoomId(groupId)
@@ -81,11 +82,11 @@ export const sendMessage = async (req: Request, res: Response, next: NextFunctio
 
 export const getGroupMessages = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const groupId = req.params.groupId
+        const groupId = new mongoose.Types.ObjectId(req.params.groupId)
         if(!groupId)throw new AppError("Invalid request.", 400)
 
-        const messages = GroupMessages.find({groupId})
-
+            const messages = await GroupMessages.find({groupId}).populate('senderId')
+        
         res.status(200).json(messages)
 
     } catch (error) {

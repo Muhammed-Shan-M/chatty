@@ -34,7 +34,6 @@ export const useChatStore = create<ChatStore>((set, get) => ({
         set({ isMessagesLoading: true })
         try {
             const res = await axiosInstance.get(`/messages/${userId}`)
-            console.log(res.data)
             set({ messages: res.data })
 
         } catch (error) {
@@ -61,7 +60,6 @@ export const useChatStore = create<ChatStore>((set, get) => ({
         set({ isSendMessageLoading: true })
         const { messages, selectedUser } = get()
         try {
-            console.log(messages, selectedUser, file)
             const res = await axiosInstance.post(`/messages/send-voice/${selectedUser?._id}`, file)
             set({ messages: [...messages, res.data] })
         } catch (error) {
@@ -107,7 +105,7 @@ export const useChatStore = create<ChatStore>((set, get) => ({
                     : state.unreadMessages
             }));
 
-            const res = await markAsRead(userId,selectedUser._id)
+            const res = await markAsRead(userId, selectedUser._id)
 
             if (!res.data.success) {
                 set({ unreadMessages: rollBack })

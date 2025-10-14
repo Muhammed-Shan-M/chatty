@@ -9,7 +9,7 @@ export interface GroupMessage {
     groupId: string
     senderId:User
     text: string
-    attachment: GroupMessagesAttachment[],
+    attachments: GroupMessagesAttachment[],
     type: string
 }
 

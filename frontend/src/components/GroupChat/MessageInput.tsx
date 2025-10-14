@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Image, LoaderCircle, Mic, Send, Trash2, X } from "lucide-react";
 import { toast } from "react-toastify";
-import { useChatStore } from "../../store/chatStore";
+import { useGroupChatStore } from "@/store/groupChatStore";
 
 
 export const MessageInput = () => {
@@ -9,7 +9,8 @@ export const MessageInput = () => {
     const [text, setText] = useState("");
     const [imagePreview, setImagePreview] = useState<string | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
-    const { isSendMessageLoading } = useChatStore(); // Todo : chnage with group message Store
+    const { isSendMessageLoading } = useGroupChatStore();
+    const {sendMessage} = useGroupChatStore()
 
 
 
@@ -60,7 +61,8 @@ export const MessageInput = () => {
 
             formaData.append('image', file)
             formaData.append('text', text)
-            // await sendMessage(formaData)// Todo: give the funtion from groupmessages
+            await sendMessage(formaData) // Todo: give the funtion from groupmessages
+            console.log(text, file)
 
             setText("");
             removeImage()
@@ -105,7 +107,7 @@ export const MessageInput = () => {
                         formData.append('image',file)
                     }
 
-                    // await sendVoiceMessage(formData) // Todo: give the funtion from groupmessages
+                    await sendMessage(formData) // Todo: give the funtion from groupmessages
 
                     if(fileInputRef.current)removeImage()
                 } catch (error) {

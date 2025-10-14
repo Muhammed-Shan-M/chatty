@@ -3,18 +3,18 @@ import type { Types, Document } from "mongoose"
 
 export interface GroupMessagesAttachment {
     url: string,
-    fileType: 'image'|'voice'
-} 
+    fileType: 'image' | 'voice'
+}
 
 export interface GroupMessage {
     groupId: Types.ObjectId
-    senderId:Types.ObjectId
+    senderId: Types.ObjectId
     text: string
     attachments: GroupMessagesAttachment[],
-    type: string
+    type: 'text' | 'image' | 'voice' | 'mixed'
 }
 
-export interface IGroupMessages extends GroupMessage,Document {
+export interface IGroupMessages extends GroupMessage, Document {
     _id: Types.ObjectId,
     createdAt: Date,
     updatedAt: Date
