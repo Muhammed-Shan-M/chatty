@@ -169,8 +169,13 @@ export const useAuthStore = create<AuthStateType>((set, get) => ({
             }
         });
 
-    },
 
+        socket.on('groupNotification', ({groupId, newMessage}) => {
+            console.log(groupId, newMessage)
+        })
+
+    },
+    // Todo : orginize the socket io event and emit
     disconnectSocket: async () => {
         if (get().socket?.connect()) get().socket?.disconnect()
     }

@@ -3,13 +3,12 @@ import { createRoomId } from "../utility/createRoomId.utility.ts";
 import { groupRooms, notificationFlag } from "../State/socketState.ts";
 
 export const groupHandler = (io:Server, socket: Socket) => {
-    socket.on('join-group', (groupId) => {
+    socket.on('join-group', (groupId, userId) => {
         const roomId = createRoomId(groupId)
         if(!groupRooms.has(roomId)){
             groupRooms.set(roomId, new Set())
         }
 
-        const userId = socket.handshake.query.userId as string
         groupRooms.get(roomId)?.add(userId)
 
         socket.join(roomId)
@@ -24,9 +23,9 @@ export const groupHandler = (io:Server, socket: Socket) => {
     })
 
 
-    socket.on('leaveGroup', (groupId) => {
+    socket.on('leaveGroup', (groupId,userId) => {
         const roomId = createRoomId(groupId)
-        const userId = socket.handshake.query.userId as string
+
         groupRooms.get(roomId)?.delete(userId)
         socket.leave(roomId)
 

@@ -4,5 +4,5 @@ import { io } from "../socket.ts";
 
 
 export function emiteNewGroupMessage(newMessage: IGroupMessages, roomId: string) {
-    io.to(roomId).emit('newGroupMessage', { roomId, newMessage })
+    io.to(roomId).emit('newGroupMessage', {newMessage, groupId: newMessage.groupId })
 }

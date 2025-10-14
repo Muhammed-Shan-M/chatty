@@ -8,19 +8,36 @@ import { useGroupStore } from '../../store/group'
 import { getStartMessage } from '../../utility/getWelcomeMessage'
 import { GroupInfoPage } from './GroupInfo'
 import { useGroupChatStore } from '@/store/groupChatStore'
-import { useEffect } from 'react'
+import { use, useEffect } from 'react'
+import { useShallow } from 'zustand/shallow'
+import type { GroupChatStore } from '@/types/GroupChatStore'
 
 
 export const ChatContainer = () => {
 
     const { authUser } = useAuthStore()
-    const { groupMessages: messages, getMessages } = useGroupChatStore()
+    const { messages, getMessages, joinToGroup , leaveGroup} = useGroupChatStore(
+        useShallow((state:GroupChatStore) => ({
+            messages:state.groupMessages,
+            getMessages: state.getMessages,
+            joinToGroup: state.joinToGroup,
+            leaveGroup: state.leaveGroup
+        }))
+    )
     const { showGroupInfo, selectedGroup } = useGroupStore()
 
     useEffect(() => {
-        getMessages()
+        if(!selectedGroup)return
 
-    }, [getMessages])
+        getMessages(selectedGroup._id)
+
+        joinToGroup(selectedGroup?._id)
+
+        return () => leaveGroup(selectedGroup?._id)
+
+    }, [getMessages, selectedGroup, joinToGroup, leaveGroup])
+
+    
 
     if (showGroupInfo) {
         return (

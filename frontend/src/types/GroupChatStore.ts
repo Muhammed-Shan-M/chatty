@@ -8,5 +8,7 @@ export interface GroupChatStore {
     isSendMessageLoading: boolean,
 
     sendMessage: (formdata: FormData) => Promise<void> 
-    getMessages: () => Promise<void>
+    getMessages: (groupId: string) => Promise<void>
+    joinToGroup: (groupId: string) => void
+    leaveGroup: (groupId: string) => void
 }

@@ -48,7 +48,7 @@ export const useGroupStore = create<GroupStore>((set,get) => ({
     setShowGroupInfo: (val) => {
         set({showGroupInfo: val})
         if(!val)set({groupInfo: null})
-    } ,
+    },
 
     fetchGroupInfo: async (groupId) => {
         set({isGroupInfoLoading: true})

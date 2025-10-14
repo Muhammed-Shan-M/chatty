@@ -3,6 +3,7 @@ import type { GroupChatStore } from '@/types/GroupChatStore'
 import { axiosInstance } from '@/lib/axios'
 import { useGroupStore } from './group'
 import { errorHandler } from '@/utility/errorHandler'
+import { useAuthStore } from './useAuthStore'
 
 
 export const useGroupChatStore = create<GroupChatStore>((set,get) => ({
@@ -12,11 +13,11 @@ export const useGroupChatStore = create<GroupChatStore>((set,get) => ({
     isSendMessageLoading: false,
 
 
-    getMessages: async () => {
+    getMessages: async (groupId) => {
         set({isGroupMessageLoading: true})
         try {
-            const {selectedGroup} = useGroupStore.getState()
-            const res = await axiosInstance.get(`/group-message/${selectedGroup?._id}/getMessages`)
+
+            const res = await axiosInstance.get(`/group-message/${groupId}/getMessages`)
 
             set({groupMessages: res.data})
         } catch (error) {
@@ -39,5 +40,26 @@ export const useGroupChatStore = create<GroupChatStore>((set,get) => ({
         } finally {
             set({isSendMessageLoading: false})
         }
+    },
+
+    joinToGroup: (groupId) => {
+        const {socket, authUser} = useAuthStore.getState()
+        const {selectedGroup} = useGroupStore.getState()
+
+        socket?.emit('join-group', groupId, authUser?._id)
+
+
+        socket?.on('newGroupMessage',({newMessage, groupId}) => {
+            if(newMessage.senderId._id !== authUser?._id && groupId ===  selectedGroup?._id){
+                set({groupMessages: [...get().groupMessages,newMessage]})
+            }
+        })
+    },
+
+    leaveGroup: (groupId) => {
+        const {socket, authUser} = useAuthStore.getState()
+
+        socket?.emit('leaveGroup', groupId, authUser?._id)
+        socket?.off('newGroupMessage')
     }
 }))

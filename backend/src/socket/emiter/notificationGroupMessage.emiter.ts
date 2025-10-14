@@ -14,7 +14,7 @@ export function emiteGroupNotification(groupMembers:string[] , newMessage: IGrou
             const flags = notificationFlag.get(memberId) || new Map()
 
             if (!flags.get(roomId)) {
-                io.to(memberId).emit('groupNotification', { roomId, newMessage })
+                io.to(memberId).emit('groupNotification', { groupId: newMessage.groupId, newMessage })
                 flags.set(roomId, true)
                 notificationFlag.set(memberId, flags)
             }

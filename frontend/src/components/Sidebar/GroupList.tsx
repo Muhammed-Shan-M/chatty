@@ -2,19 +2,19 @@
 import type { GroupWithoutPopulate } from '@/types/Group';
 import { useGroupStore } from '../../store/group';
 import { useAuthStore } from '../../store/useAuthStore';
+import { useChatStore } from '@/store/chatStore';
 
 
 interface GroupListItemProps {
     group: GroupWithoutPopulate;
-    // selectedGroup?: IGroup | null;
-    // add other props like chatData if needed
 }
 
 
 export const GroupList = ({ group }: GroupListItemProps) => {
 
     const { setShowUserInfo, showUserInfo } = useAuthStore()
-    const {selectedGroup, setSelectedGroup} = useGroupStore()
+    const { selectedGroup, setSelectedGroup } = useGroupStore()
+    const { setSelectedUser } = useChatStore()
 
     return (
         <button
@@ -22,6 +22,7 @@ export const GroupList = ({ group }: GroupListItemProps) => {
             onClick={() => {
                 setSelectedGroup(group)
                 setShowUserInfo(false)
+                setSelectedUser(null)
             }}
             className={`
         w-full p-3 flex items-center gap-3 relative transition-colors
@@ -39,12 +40,12 @@ export const GroupList = ({ group }: GroupListItemProps) => {
 
 
 
-                <div className="text-left min-w-0 flex-1">
-                    <div className="font-medium truncate">{group.groupName}</div>
-                    <div className="text-sm text-zinc-400 flex justify-between items-center">
-                        {/* Last message preview */}
-                    </div>
+            <div className="text-left min-w-0 flex-1">
+                <div className="font-medium truncate">{group.groupName}</div>
+                <div className="text-sm text-zinc-400 flex justify-between items-center">
+                    {/* Last message preview */}
                 </div>
+            </div>
 
         </button>
     )

@@ -62,7 +62,6 @@ export const MessageInput = () => {
             formaData.append('image', file)
             formaData.append('text', text)
             await sendMessage(formaData) // Todo: give the funtion from groupmessages
-            console.log(text, file)
 
             setText("");
             removeImage()

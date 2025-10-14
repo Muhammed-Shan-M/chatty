@@ -80,7 +80,6 @@ export const useChatStore = create<ChatStore>((set, get) => ({
             if (!isMessageSendFromSelectedUser) return
 
             set({ messages: [...get().messages, newMessage] })
-            console.log('message :', get().messages)
         })
     },
 
@@ -90,6 +89,12 @@ export const useChatStore = create<ChatStore>((set, get) => ({
     },
 
     setSelectedUser: async (selectedUser) => {
+
+        if(selectedUser === null){
+            set({selectedUser: null})
+            return
+        }
+
         set({ selectedUser })
         const rollBack = [...get().unreadMessages]
 
