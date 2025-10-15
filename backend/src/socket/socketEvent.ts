@@ -16,6 +16,8 @@ export const registerSocketEvent = (io: Server) => {
             }
         }
 
+        console.log('notification flag form connect',notificationFlag)
+
         io.emit('getOnlineUsers', Object.keys(usersSocketMap))
 
 

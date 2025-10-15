@@ -8,26 +8,28 @@ import { useGroupStore } from '../../store/group'
 import { getStartMessage } from '../../utility/getWelcomeMessage'
 import { GroupInfoPage } from './GroupInfo'
 import { useGroupChatStore } from '@/store/groupChatStore'
-import { use, useEffect } from 'react'
+import { useEffect } from 'react'
 import { useShallow } from 'zustand/shallow'
 import type { GroupChatStore } from '@/types/GroupChatStore'
+import { MessageSkeleton } from '../Skeleton/MessageSkeleton'
 
 
 export const ChatContainer = () => {
 
     const { authUser } = useAuthStore()
-    const { messages, getMessages, joinToGroup , leaveGroup} = useGroupChatStore(
-        useShallow((state:GroupChatStore) => ({
-            messages:state.groupMessages,
+    const { messages, getMessages, joinToGroup, leaveGroup, isGroupMessageLoading} = useGroupChatStore(
+        useShallow((state: GroupChatStore) => ({
+            messages: state.groupMessages,
             getMessages: state.getMessages,
             joinToGroup: state.joinToGroup,
-            leaveGroup: state.leaveGroup
+            leaveGroup: state.leaveGroup,
+            isGroupMessageLoading: state.isGroupMessageLoading
         }))
     )
     const { showGroupInfo, selectedGroup } = useGroupStore()
 
     useEffect(() => {
-        if(!selectedGroup)return
+        if (!selectedGroup) return
 
         getMessages(selectedGroup._id)
 
@@ -37,7 +39,17 @@ export const ChatContainer = () => {
 
     }, [getMessages, selectedGroup, joinToGroup, leaveGroup])
 
-    
+
+    if (isGroupMessageLoading) {
+        return (
+            <div className="flex-1 flex flex-col overflow-auto">
+                <ChatHeader />
+                <MessageSkeleton />
+                <MessageInput />
+            </div>
+        )
+    }
+
 
     if (showGroupInfo) {
         return (
@@ -47,8 +59,6 @@ export const ChatContainer = () => {
         )
     }
 
-    
-    
     const welcomeText = getStartMessage(selectedGroup!, authUser?._id!)
 
     return (
@@ -96,7 +106,7 @@ export const ChatContainer = () => {
                                             />
                                         ) : file.fileType === 'voice' ? (
                                             <AudioPlayer key={index} src={file.url} />
-                                        ) : null  
+                                        ) : null
                                     ))}
                                 </>
                             )}

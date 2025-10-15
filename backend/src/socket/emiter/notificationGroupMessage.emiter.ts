@@ -11,10 +11,22 @@ export function emiteGroupNotification(groupMembers:string[] , newMessage: IGrou
         const isOnline = usersSocketMap[memberId]
 
         if (isOnline && !isRoom) {
-            const flags = notificationFlag.get(memberId) || new Map()
+            const flags = notificationFlag.get(memberId)
+
+            if(!flags)return
+
+            if(!flags?.has(roomId)){
+                flags?.set(roomId, false)
+                notificationFlag.set(memberId,flags)
+            }
+            
+            // console.log('from notification flag: ', flags, 'notification :', notificationFlag);
+            
 
             if (!flags.get(roomId)) {
-                io.to(memberId).emit('groupNotification', { groupId: newMessage.groupId, newMessage })
+                const userSocketId = usersSocketMap[memberId] 
+                if(!userSocketId) return
+                io.to(userSocketId).emit('groupNotification', { groupId: newMessage.groupId, newMessage })
                 flags.set(roomId, true)
                 notificationFlag.set(memberId, flags)
             }
