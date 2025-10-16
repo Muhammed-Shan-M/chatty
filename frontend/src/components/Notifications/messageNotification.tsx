@@ -1,19 +1,19 @@
-import type { Notification } from "../../types/Notification";
 
 
 
-export default function MessageNotification(notification: Notification) {
+
+export default function MessageNotification(from: string, preview: string, userName: string = '') {
 
     return (
         <div className={' p-3 rounded-lg shadow-lg bg-secondary text-white'}
             style={{ minWidth: "250px", maxWidth: "90vw" }} 
         >
             <div className="font-bold text-sm md:text-base truncate">
-                New message from {notification.senderUserName}
+                New message from {from}
             </div>
 
             <div className="mt-1 text-xs md:text-sm truncate">
-                {notification.preview}
+                {userName ? `${userName} : ${preview}` : preview}
             </div>
         </div>
     )

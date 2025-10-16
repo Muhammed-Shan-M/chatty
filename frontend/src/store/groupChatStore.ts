@@ -12,6 +12,8 @@ export const useGroupChatStore = create<GroupChatStore>((set,get) => ({
 
     isSendMessageLoading: false,
 
+    unreadMessages:[],
+
 
     getMessages: async (groupId) => {
         set({isGroupMessageLoading: true})
@@ -61,5 +63,25 @@ export const useGroupChatStore = create<GroupChatStore>((set,get) => ({
 
         socket?.emit('leaveGroup', groupId, authUser?._id)
         socket?.off('newGroupMessage')
+    },
+
+    fetchUnreadMessages: async (userId) => {
+        try {
+            const res = await axiosInstance.get(`/group-message/${userId}/get-unread-messages`)
+
+            set({unreadMessages: res.data})
+        } catch (error) {
+            errorHandler(error)
+        }
+    },
+
+    markAsReadUnreadMessages: async (groupId:string) => {
+        try {
+            const userId = useAuthStore.getState().authUser?._id
+            const res = await axiosInstance.patch(`/${groupId}/markAsRead-ureadMessages`,{userId})
+            set({unreadMessages:[...get().unreadMessages,res.data]})
+        } catch (error) {
+            errorHandler(error)
+        }
     }
 }))

@@ -13,11 +13,14 @@ export function emitNotification(notification: Notification) {
     }
 
     toast(
-        MessageNotification(notification),
+        MessageNotification(notification.senderUserName, notification.preview),
         {
-            position: "top-center", // top center
+            position: "top-center", 
             autoClose: 4000,
             pauseOnHover: true,
         }
     );
 }
+
+
+// Todo: upgrade notification system

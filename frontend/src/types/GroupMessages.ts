@@ -11,6 +11,7 @@ export interface GroupMessage {
     text: string
     attachments: GroupMessagesAttachment[],
     type: string
+    preview: string
 }
 
 export interface IGroupMessages extends GroupMessage {

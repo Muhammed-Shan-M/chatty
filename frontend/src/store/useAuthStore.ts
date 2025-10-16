@@ -9,6 +9,8 @@ import { io } from 'socket.io-client'
 import { emitNotification } from '../utility/emitNotification'
 import { useChatStore } from './chatStore'
 import { markAsRead } from '../utility/markAsRead'
+import { useGroupStore } from './group'
+import { emitGroupNotification } from '@/utility/emiteGroupNotification'
 
 const BASE_URL = import.meta.env.VITE_API_SOCKET_URL
 
@@ -170,8 +172,19 @@ export const useAuthStore = create<AuthStateType>((set, get) => ({
         });
 
 
-        socket.on('groupNotification', ({groupId, newMessage}) => {
-            console.log(groupId, newMessage)
+        socket.on('groupNotification', ({groupId, preview,groupName,senderUserName}) => {
+            const {groups} = useGroupStore.getState()
+            const isGroupExist = groups.find(g => g._id === groupId)
+            if(!isGroupExist)return
+
+            emitGroupNotification(preview, groupName, senderUserName)
+        })
+
+
+
+        socket.on('Group:updateUnreadMessage', (unreadMessage) => {
+            console.log('kkk',unreadMessage);
+            
         })
 
     },

@@ -12,6 +12,7 @@ export interface GroupMessage {
     text: string
     attachments: GroupMessagesAttachment[],
     type: 'text' | 'image' | 'voice' | 'mixed'
+    preview: string
 }
 
 export interface IGroupMessages extends GroupMessage, Document {

@@ -14,6 +14,8 @@ import { UsersList } from './UsersList';
 import { useGroupStore } from '../../store/group';
 import type { GroupStore } from '../../types/groupStore';
 import { GroupList } from './GroupList';
+import { useGroupChatStore } from '@/store/groupChatStore';
+import type { GroupChatStore } from '@/types/GroupChatStore';
 
 
 
@@ -41,6 +43,13 @@ export const Sidebar = ({ cbForModal }: { cbForModal: () => void }) => {
         useShallow((state: GroupStore) => ({
             groups: state.groups,
             fecthGroups: state.fecthGroups
+        }))
+    )
+
+    const {fetchUnreadMessages: FetchGroupUnreadMessage, unreadMessages: groupUnreadMessage} = useGroupChatStore(
+        useShallow((state: GroupChatStore) => ({
+            fetchUnreadMessages: state.fetchUnreadMessages,
+            unreadMessages: state.unreadMessages
         }))
     )
 
@@ -74,6 +83,16 @@ export const Sidebar = ({ cbForModal }: { cbForModal: () => void }) => {
         );
     }, [unreadMessages]);
 
+    const unreadGroupMap = useMemo(() => {
+        return Object.fromEntries(
+            groupUnreadMessage.map((msg) => [msg._id, msg])
+        ) 
+    }, [groupUnreadMessage])
+
+
+    // ToDo : blance from here , show the unread group message to frondent , first step i create the unreadGroupMap
+
+    
 
     useEffect(() => {
         const sorted = filteredUsers.reduce((acc, user) => {
@@ -95,8 +114,9 @@ export const Sidebar = ({ cbForModal }: { cbForModal: () => void }) => {
     useEffect(() => {
         if (authUser) {
             fetchUnreadMessages(authUser?._id)
+            FetchGroupUnreadMessage(authUser._id)
         }
-    }, [authUser, fetchUnreadMessages])
+    }, [authUser, fetchUnreadMessages, FetchGroupUnreadMessage])
 
 
     useEffect(() => {
@@ -116,8 +136,10 @@ export const Sidebar = ({ cbForModal }: { cbForModal: () => void }) => {
         return () => mediaQuery.removeEventListener('change', handler)
     }, [])
 
-
+  
     if (isUsersLoading) return <SidebarSkeleton />;
+
+    // Todo : somany rerenders when a new user logins
 
     return (
         <aside

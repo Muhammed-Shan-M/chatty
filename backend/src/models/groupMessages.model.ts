@@ -14,7 +14,8 @@ const groupMessageSchema = new mongoose.Schema<IGroupMessages>(
                 fileType: {type: String,enum:['image','voice'] ,require: true}
             }
         ],
-        type: {type: String, enum: ['text', 'image', 'voice', 'mixed']}
+        type: {type: String, enum: ['text', 'image', 'voice', 'mixed']},
+        preview: {type: String, required: true}
     },{timestamps: true}
 )
 
