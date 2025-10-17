@@ -15,6 +15,8 @@ export interface GroupStore {
     isGroupChat: boolean,
     selectedGroup: GroupWithoutPopulate | null,
 
+    activeUsers: Record<string, number>
+
     createGroup: (formData:FormData ) => Promise<void> 
     fecthGroups: () => Promise<void>
     setSelectedGroup: (group: GroupWithoutPopulate | null) => Promise<void>
@@ -25,4 +27,5 @@ export interface GroupStore {
     removeMember: (userId: string) => Promise<void>
     putAsAdmin: (userId: string) => Promise<void>
     removeAdmin: (userId: string) => Promise<void>
+    setActiveUsers:(activeusers:Record<string, number>) => void
 }

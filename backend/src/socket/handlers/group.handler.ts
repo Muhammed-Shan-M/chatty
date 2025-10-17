@@ -18,6 +18,7 @@ export const groupHandler = (io:Server, socket: Socket) => {
         }
 
         notificationFlag.get(userId)?.set(roomId, false)
+        io.emit('new-activeUser',groupId,1)
 
         console.log(`${userId} joined group ${roomId}`)
     })
@@ -29,6 +30,22 @@ export const groupHandler = (io:Server, socket: Socket) => {
         groupRooms.get(roomId)?.delete(userId)
         socket.leave(roomId)
 
+        io.emit('new-activeUser',groupId,-1)
         console.log(`${userId} leave group ${roomId}`)
+    })
+
+
+
+    socket.on('getActiveUsers',(groupIds: string[], cb) => {
+        if(groupIds.length === 0)return
+
+        let result:Record<string,number> = {}
+
+        groupIds.forEach((id) => {
+            const set = groupRooms.get(id)
+            result[id] = set ? set.size : 0
+        })
+
+        cb(result)
     })
 }

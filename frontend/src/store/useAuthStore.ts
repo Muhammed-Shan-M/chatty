@@ -12,6 +12,12 @@ import { markAsRead } from '../utility/markAsRead'
 import { useGroupStore } from './group'
 import { emitGroupNotification } from '@/utility/emiteGroupNotification'
 
+import EventEmitter from 'eventemitter3';
+import { findChatId } from '@/utility/findChatId'
+import { useGroupChatStore } from './groupChatStore'
+
+const emitter = new EventEmitter();
+
 const BASE_URL = import.meta.env.VITE_API_SOCKET_URL
 
 export const useAuthStore = create<AuthStateType>((set, get) => ({
@@ -26,7 +32,13 @@ export const useAuthStore = create<AuthStateType>((set, get) => ({
     socket: null,
     showUserInfo: false,
 
-    setShowUserInfo: (val) => set({ showUserInfo: val }),
+    setShowUserInfo: (val) => {
+        set({ showUserInfo: val })
+
+        if(emitter.listenerCount('read-unreadMsg') > 0){
+            emitter.emit('read-unreadMsg')
+        }
+    },
 
     checkAuth: async () => {
         try {
@@ -153,6 +165,21 @@ export const useAuthStore = create<AuthStateType>((set, get) => ({
                     if (get().showUserInfo) {
                         emitNotification(notification);
                         fetchUnreadMessages(authUser._id);
+
+                        const selectedId = selectedUser?._id
+
+                        emitter.on('read-unreadMsg',async () => {
+                            console.log('from the evernt : ', selectedId, useChatStore.getState().selectedUser?._id);
+                            if(!get().showUserInfo && selectedId === useChatStore.getState().selectedUser?._id){
+                                const res = await markAsRead(authUser._id, selectedUser?._id!);
+                                
+                                if(res.data.success){
+                                    const chatId = findChatId(get().authUser?._id!, selectedId!)
+                                    useChatStore.getState().setUnreadMessage(chatId)
+                                }
+                            }
+                        })
+
                         return 
                     }
 
@@ -183,10 +210,15 @@ export const useAuthStore = create<AuthStateType>((set, get) => ({
 
 
         socket.on('Group:updateUnreadMessage', (unreadMessage) => {
-            console.log('kkk',unreadMessage);
-            
+            useGroupChatStore.getState().setUnreadMessages(unreadMessage)
         })
 
+
+        socket.on('new-activeUser', (groupId:string, count: number) =>{
+            console.log('from new acive users : ',groupId,count);
+            
+            useGroupStore.getState().setActiveUsers({[groupId]: count})
+        })
     },
     // Todo : orginize the socket io event and emit
     disconnectSocket: async () => {

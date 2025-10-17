@@ -10,7 +10,7 @@ router.get('/:groupId/getMessages', protectedRoute, getGroupMessages)
 
 
 router.get('/:userId/get-unread-messages',protectedRoute, findUnreadMessages)
-router.patch('/:groupId/markAsRead-ureadMessages',protectedRoute,markAsReadUnreadCounts )
+router.patch('/:groupId/markAsRead-ureadMessages',protectedRoute, markAsReadUnreadCounts)
 
 
 export default router

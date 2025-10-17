@@ -124,22 +124,24 @@ export const findUnreadMessages = async (req: Request, res: Response, next: Next
 }
 
 
-export const markAsReadUnreadCounts = async (req: Request, res: Response, next: NextFunction) => {
+export const markAsReadUnreadCounts = async (req: Request, res: Response, next: NextFunction) => {    
     try {
-        const groupId = req.params.groupId
-        const userId = req.body.userId
+        const groupId = new mongoose.Types.ObjectId(req.params.groupId)
+        const userId = new mongoose.Types.ObjectId(req.body.userId as string)        
 
         const unrecount = await UnreadCount.findOneAndUpdate(
             {userId, groupId},
-            {$set:{unreadCount: 0, lastReadMessageId: ''}},
+            {$set:{unreadCount: 0, lastReadMessageId: null}},
             {upsert: true, new: true}
         )
 
         if(unrecount){
-            res.status(200).json(unrecount)
+            res.status(200).json({success: true})
         }
 
     } catch (error) {
+        console.log(error);
+        
         next(error)       
     }
 }

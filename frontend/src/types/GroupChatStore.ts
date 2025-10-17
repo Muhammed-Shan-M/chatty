@@ -16,4 +16,5 @@ export interface GroupChatStore {
     leaveGroup: (groupId: string) => void
     fetchUnreadMessages: (userId : string) => Promise<void>
     markAsReadUnreadMessages: (groupId: string) => Promise<void>
+    setUnreadMessages:(unreadMessage: IUnreadCountForGroup) => void
 }

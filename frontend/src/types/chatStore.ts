@@ -18,4 +18,5 @@ export interface ChatStore {
     unsubscribeFromMessages: () => void
     setSelectedUser: (selecteduser: User | null) => Promise<void>
     fetchUnreadMessages: (userId: string) => Promise<void>
+    setUnreadMessage: (chatId: string) => void
 }

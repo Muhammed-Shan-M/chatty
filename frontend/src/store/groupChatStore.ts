@@ -78,10 +78,26 @@ export const useGroupChatStore = create<GroupChatStore>((set,get) => ({
     markAsReadUnreadMessages: async (groupId:string) => {
         try {
             const userId = useAuthStore.getState().authUser?._id
-            const res = await axiosInstance.patch(`/${groupId}/markAsRead-ureadMessages`,{userId})
-            set({unreadMessages:[...get().unreadMessages,res.data]})
+            const rollBack = [...get().unreadMessages]
+
+            set((state) => ({
+                unreadMessages: state.unreadMessages.some(item => item.groupId === groupId)
+                    ? state.unreadMessages.filter(item => item.groupId !== groupId)
+                    : state.unreadMessages
+            }));
+
+            const res = await axiosInstance.patch(`/group-message/${groupId}/markAsRead-ureadMessages`,{userId})
+
+            if(!res.data.success){
+                set({unreadMessages:rollBack})
+            }
+            
         } catch (error) {
             errorHandler(error)
         }
+    },
+
+    setUnreadMessages: (unreadMessages) => {
+        set({unreadMessages: [...get().unreadMessages, unreadMessages]})
     }
 }))

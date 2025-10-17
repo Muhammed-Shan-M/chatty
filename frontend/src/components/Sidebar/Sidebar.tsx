@@ -16,6 +16,8 @@ import type { GroupStore } from '../../types/groupStore';
 import { GroupList } from './GroupList';
 import { useGroupChatStore } from '@/store/groupChatStore';
 import type { GroupChatStore } from '@/types/GroupChatStore';
+import type { GroupWithoutPopulate } from '@/types/Group';
+import { getActiveUsers } from '@/utility/getActiveUsers';
 
 
 
@@ -58,6 +60,7 @@ export const Sidebar = ({ cbForModal }: { cbForModal: () => void }) => {
     const [showOnlineOnly, setShowOnlineOnly] = useState(false);
     const [sortedUsers, setSortedUsers] = useState<User[] | null>(null)
     const [showGroups, setShowGroups] = useState(true)
+    const [sortedGroups, setSortedGroups] = useState<GroupWithoutPopulate[]>([])
 
 
 
@@ -85,24 +88,30 @@ export const Sidebar = ({ cbForModal }: { cbForModal: () => void }) => {
 
     const unreadGroupMap = useMemo(() => {
         return Object.fromEntries(
-            groupUnreadMessage.map((msg) => [msg._id, msg])
+            groupUnreadMessage.map((msg) => [msg.groupId, msg])
         ) 
     }, [groupUnreadMessage])
 
-
-    // ToDo : blance from here , show the unread group message to frondent , first step i create the unreadGroupMap
-
+    
     
 
     useEffect(() => {
-        const sorted = filteredUsers.reduce((acc, user) => {
+        const sortedUser = filteredUsers.reduce((acc, user) => {
             if (unreadMap[user.chatId]) acc.unshift(user)
             else acc.push(user)
 
             return acc
         }, [] as User[])
 
-        setSortedUsers(sorted)
+        const sortedGroup = groups.reduce((acc, group) => {
+            if(unreadGroupMap[group._id]) acc.unshift(group)
+            else acc.push(group)
+
+            return acc 
+        },[] as GroupWithoutPopulate[])
+
+        setSortedUsers(sortedUser)
+        setSortedGroups(sortedGroup)
     }, [unreadMessages, filteredUsers])
 
 
@@ -110,6 +119,10 @@ export const Sidebar = ({ cbForModal }: { cbForModal: () => void }) => {
         getUsers();
         fecthGroups()
     }, [getUsers, fecthGroups]);
+
+    useEffect(() => {
+        getActiveUsers(groups)
+    },[groups])
 
     useEffect(() => {
         if (authUser) {
@@ -205,9 +218,9 @@ export const Sidebar = ({ cbForModal }: { cbForModal: () => void }) => {
 
                 {showGroups && (
                     <div className="pb-2 max-h-[250px] overflow-y-auto overflow-x-hidden">
-                        {groups.length > 0 ? (
-                            groups.map((group) => (
-                                <GroupList key={group._id} group={group} />
+                        {sortedGroups.length > 0 ? (
+                            sortedGroups.map((group) => (
+                                <GroupList key={group._id} chatData={unreadGroupMap[group._id]} group={group} />
                             ))
                         ) : (
                             <div className="px-3 py-4 text-center text-sm text-zinc-500">

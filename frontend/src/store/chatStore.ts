@@ -90,8 +90,8 @@ export const useChatStore = create<ChatStore>((set, get) => ({
 
     setSelectedUser: async (selectedUser) => {
 
-        if(selectedUser === null){
-            set({selectedUser: null})
+        if (selectedUser === null) {
+            set({ selectedUser: null })
             return
         }
 
@@ -104,11 +104,12 @@ export const useChatStore = create<ChatStore>((set, get) => ({
             if (!selectedUser?._id || !userId) throw new Error('Required user identifiers are missing.')
             const chatId = findChatId(userId, selectedUser?._id)
 
-            set((state) => ({
-                unreadMessages: state.unreadMessages.some(item => item._id === chatId)
-                    ? state.unreadMessages.filter(item => item._id !== chatId)
-                    : state.unreadMessages
-            }));
+            // set((state) => ({
+            //     unreadMessages: state.unreadMessages.some(item => item._id === chatId)
+            //         ? state.unreadMessages.filter(item => item._id !== chatId)
+            //         : state.unreadMessages
+            // }));
+            get().setUnreadMessage(chatId)
 
             const res = await markAsRead(userId, selectedUser._id)
 
@@ -128,5 +129,13 @@ export const useChatStore = create<ChatStore>((set, get) => ({
         } catch (error) {
             errorHandler(error)
         }
+    },
+
+    setUnreadMessage: (chatId) => {        
+        set((state) => ({
+            unreadMessages: state.unreadMessages.some(item => item._id === chatId)
+                ? state.unreadMessages.filter(item => item._id !== chatId)
+                : state.unreadMessages
+        }));
     }
 }))
