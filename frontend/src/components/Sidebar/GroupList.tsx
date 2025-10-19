@@ -1,9 +1,13 @@
 
+import React from 'react';
 import type { GroupWithoutPopulate } from '@/types/Group';
 import { useGroupStore } from '../../store/group';
 import { useAuthStore } from '../../store/useAuthStore';
 import { useChatStore } from '@/store/chatStore';
 import type { IUnreadCountForGroup } from '@/types/UnreadCountForGroup';
+import { useShallow } from 'zustand/shallow';
+import type { AuthStateType } from '@/types/userAuthStoreType';
+import type { GroupStore } from '@/types/groupStore';
 
 
 interface GroupListItemProps {
@@ -12,11 +16,23 @@ interface GroupListItemProps {
 }
 
 
-export const GroupList = ({ group, chatData }: GroupListItemProps) => {
+export const GroupList = React.memo(({ group, chatData }: GroupListItemProps) => {
 
-    const { setShowUserInfo, showUserInfo } = useAuthStore()
-    const { selectedGroup, setSelectedGroup, activeUsers } = useGroupStore()
-    const { setSelectedUser } = useChatStore()
+    const { setShowUserInfo, showUserInfo } = useAuthStore(
+        useShallow((state: AuthStateType) => ({
+            setShowUserInfo: state.setShowUserInfo,
+            showUserInfo: state.showUserInfo
+        }))
+    )
+
+    const { selectedGroup, setSelectedGroup, activeUsers } = useGroupStore(
+        useShallow((state: GroupStore) => ({
+            selectedGroup: state.selectedGroup,
+            setSelectedGroup: state.setSelectedGroup,
+            activeUsers: state.activeUsers
+        }))
+    )
+    const setSelectedUser = useChatStore(state => state.setSelectedUser)
 
     return (
         <button
@@ -72,4 +88,4 @@ export const GroupList = ({ group, chatData }: GroupListItemProps) => {
 
         </button>
     )
-}
+})

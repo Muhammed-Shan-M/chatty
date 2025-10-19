@@ -15,6 +15,7 @@ import { emitGroupNotification } from '@/utility/emiteGroupNotification'
 import EventEmitter from 'eventemitter3';
 import { findChatId } from '@/utility/findChatId'
 import { useGroupChatStore } from './groupChatStore'
+import type { User } from '@/types/user'
 
 const emitter = new EventEmitter();
 
@@ -151,7 +152,13 @@ export const useAuthStore = create<AuthStateType>((set, get) => ({
 
         socket.on('getOnlineUsers', (userIds) => {
             set({ onlineUsers: userIds })
-            useChatStore.getState().getUsers()
+            // useChatStore.getState().getUsers()
+        })
+
+        socket.on('signUP:newUserJoined',(userData:User) => {
+            useChatStore.setState((state) => ({
+                users: [...state.users, userData]
+            }))
         })
 
 

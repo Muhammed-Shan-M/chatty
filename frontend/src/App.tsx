@@ -13,11 +13,19 @@ import { useAuthStore } from './store/useAuthStore'
 import { ToastContainer,Bounce  } from 'react-toastify'
 import { useThemeStore } from './store/themeStore'
 import { Navbar } from './components/Navbar/Navbar'
+import { useShallow } from 'zustand/shallow'
+import type { AuthStateType } from './types/userAuthStoreType'
 
 const App = () => {
+  const theme = useThemeStore(state => state.theme)
 
-  const { authUser, checkAuth, isCheckingAuth } = useAuthStore()
-  const { theme } = useThemeStore();
+  const {authUser, checkAuth, isCheckingAuth} = useAuthStore(
+    useShallow((state:AuthStateType) => ({
+      authUser: state.authUser,
+      checkAuth: state.checkAuth,
+      isCheckingAuth: state.isCheckingAuth
+    }))
+  )
 
   useEffect(() => {
     checkAuth()
@@ -30,6 +38,7 @@ const App = () => {
       </div>
     )
   }
+
 
   return (
     <div data-theme={theme}>

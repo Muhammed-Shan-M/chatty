@@ -1,6 +1,6 @@
 
 
-
+import React from 'react';
 import { Users, ChevronsRight, Plus, ChevronDown } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { useChatStore } from '../../store/chatStore';
@@ -21,7 +21,7 @@ import { getActiveUsers } from '@/utility/getActiveUsers';
 
 
 
-export const Sidebar = ({ cbForModal }: { cbForModal: () => void }) => {
+export const Sidebar = React.memo(({ cbForModal }: { cbForModal: () => void }) => {
     const { unreadMessages, fetchUnreadMessages, getUsers, users, isUsersLoading } = useChatStore(
         useShallow((state: ChatStore) => ({
             unreadMessages: state.unreadMessages,
@@ -65,7 +65,9 @@ export const Sidebar = ({ cbForModal }: { cbForModal: () => void }) => {
 
 
 
-    const filteredUsers = useMemo(() => {
+    const filteredUsers = useMemo(() => {      
+        console.log('filtered users',users, onlineUsers);
+          
         return showOnlineOnly
             ? users.filter((user) => onlineUsers.includes(user._id))
             : users.reduce((acc, user) => {
@@ -81,12 +83,16 @@ export const Sidebar = ({ cbForModal }: { cbForModal: () => void }) => {
 
 
     const unreadMap = useMemo(() => {
+        console.log('unreadMap users');
+        
         return Object.fromEntries(
             unreadMessages.map((msg) => [msg._id, msg])
         );
     }, [unreadMessages]);
 
     const unreadGroupMap = useMemo(() => {
+        console.log('unreadMap groups');
+        
         return Object.fromEntries(
             groupUnreadMessage.map((msg) => [msg.groupId, msg])
         ) 
@@ -110,6 +116,9 @@ export const Sidebar = ({ cbForModal }: { cbForModal: () => void }) => {
             return acc 
         },[] as GroupWithoutPopulate[])
 
+        console.log('sorted useEffect');
+        
+
         setSortedUsers(sortedUser)
         setSortedGroups(sortedGroup)
     }, [unreadMessages, filteredUsers])
@@ -118,21 +127,31 @@ export const Sidebar = ({ cbForModal }: { cbForModal: () => void }) => {
     useEffect(() => {
         getUsers();
         fecthGroups()
-    }, [getUsers, fecthGroups]);
+
+        console.log('get and feth users useeffect');
+        
+   }, []); // getUsers, fecthGroups
 
     useEffect(() => {
+
+        console.log('get Active users useeffect');
+        
         getActiveUsers(groups)        
     },[groups])
 
     useEffect(() => {
+        console.log("unread msg both g-p useEffect");
+        
         if (authUser) {
             fetchUnreadMessages(authUser?._id)
             FetchGroupUnreadMessage(authUser._id)
         }
-    }, [authUser, fetchUnreadMessages, FetchGroupUnreadMessage])
+    }, [authUser])// fetchUnreadMessages, FetchGroupUnreadMessage
 
 
     useEffect(() => {
+        console.log('size captures useEffect');
+        
         const mediaQuery = window.matchMedia('(min-width: 1024px)')
 
         if (mediaQuery.matches) {
@@ -149,6 +168,8 @@ export const Sidebar = ({ cbForModal }: { cbForModal: () => void }) => {
         return () => mediaQuery.removeEventListener('change', handler)
     }, [])
 
+    // console.log('Sidebar render ');
+    
   
     if (isUsersLoading) return <SidebarSkeleton />;
 
@@ -242,4 +263,4 @@ export const Sidebar = ({ cbForModal }: { cbForModal: () => void }) => {
         </aside>
 
     )
-}
+})

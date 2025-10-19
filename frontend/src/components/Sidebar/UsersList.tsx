@@ -1,3 +1,4 @@
+import React from 'react'
 import type { UnreadMessages } from '../../types/unreadMessages'
 import type { User } from '../../types/user'
 import { useAuthStore } from '../../store/useAuthStore'
@@ -14,7 +15,7 @@ type PropsType = {
 }
 
 
-export const UsersList = ({ chatData, user }: PropsType) => {
+export const UsersList = React.memo(({ chatData, user }: PropsType) => {
 
 
     const { onlineUsers, showUserInfo, setShowUserInfo } = useAuthStore(
@@ -96,4 +97,4 @@ export const UsersList = ({ chatData, user }: PropsType) => {
         </button>
 
     )
-}
+})

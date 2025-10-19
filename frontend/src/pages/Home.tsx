@@ -1,3 +1,4 @@
+import React, { useCallback } from 'react'
 import { useChatStore } from '../store/chatStore'
 import { NoChatSelected } from '../components/chatParts/NoChatSelected'
 import { Sidebar } from '../components/Sidebar/Sidebar'
@@ -8,20 +9,25 @@ import { useState } from 'react'
 import { ChatContainer as PrivetChatContainer } from '../components/chatParts/ChatContainer'
 import { ChatContainer as GroupChatContainer } from '../components/GroupChat/ChatContainer'
 import { useGroupStore } from '../store/group'
+import { useShallow } from 'zustand/shallow'
+import type { GroupStore } from '@/types/groupStore'
 
-export const Home = () => {
-  const { selectedUser } = useChatStore()
-  const { showUserInfo } = useAuthStore()
-  const { selectedGroup, isGroupChat } = useGroupStore()
+export const Home = React.memo(() => {
+
+  const selectedUser = useChatStore(state => state.selectedUser)
+  const showUserInfo = useAuthStore(state => state.showUserInfo)
+  const {selectedGroup, isGroupChat} = useGroupStore(
+    useShallow((state: GroupStore) => ({
+      selectedGroup: state.selectedGroup,
+      isGroupChat: state.isGroupChat
+    }))
+  )
 
   const [isCreateGroupModalOpen, setIsCreateGroupModalOpen] = useState(false)
 
-  const handleOpenCreateGroupModal = () => {
+  const handleOpenCreateGroupModal = useCallback(() => {
     setIsCreateGroupModalOpen(true)
-  }
-
-
-
+  },[])
 
   // TODO: need more improve on the design when the side bar open 
   return (
@@ -57,4 +63,4 @@ export const Home = () => {
       />
     </>
   )
-}
+})

@@ -5,6 +5,7 @@ import bcrypt from "bcryptjs"
 import User from "../models/user.model.ts"
 import { genarateJwt } from "../utility/jwtUtil.utility.ts"
 import { uploadToCloudinary } from "../utility/cloudinaryuploader.utility.ts"
+import { emitNewUserJoined } from "../socket/emiter/newUserJoin.ts"
 
 
 export const signup = async (req: Request, res: Response, next:NextFunction) => {
@@ -39,8 +40,14 @@ export const signup = async (req: Request, res: Response, next:NextFunction) => 
 
             await newUser.save()
 
-            const { password: hashedPassword, ...userData } = newUser.toObject();
-            return res.status(201).json(userData)
+            const { password: hashedPassword, ...userData } = newUser.toObject()
+
+            res.status(201).json(userData)
+
+            const cleanUser = JSON.parse(JSON.stringify(userData)) 
+            emitNewUserJoined(cleanUser)
+
+            return
 
         } else {
             throw new AppError('Invalid User Data', 400)
