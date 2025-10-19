@@ -215,11 +215,10 @@ export const useAuthStore = create<AuthStateType>((set, get) => ({
 
 
         socket.on('new-activeUser', (groupId:string, count: number) =>{
-            console.log('from new acive users : ',groupId,count);
-            
             useGroupStore.getState().setActiveUsers({[groupId]: count})
         })
     },
+
     // Todo : orginize the socket io event and emit
     disconnectSocket: async () => {
         if (get().socket?.connect()) get().socket?.disconnect()

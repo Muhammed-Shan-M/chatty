@@ -121,7 +121,7 @@ export const Sidebar = ({ cbForModal }: { cbForModal: () => void }) => {
     }, [getUsers, fecthGroups]);
 
     useEffect(() => {
-        getActiveUsers(groups)
+        getActiveUsers(groups)        
     },[groups])
 
     useEffect(() => {

@@ -127,15 +127,5 @@ export const useGroupStore = create<GroupStore>((set, get) => ({
         }
     },
 
-    setActiveUsers: (activeusers: Record<string, number>) =>
-        set((state) => {
-            const newActiveUsers: Record<string, number> = { ...state.activeUsers };
-
-            for (const groupId in activeusers) {
-                newActiveUsers[groupId] = (newActiveUsers[groupId] || 0) + activeusers[groupId];
-            }
-
-            return { activeUsers: newActiveUsers };
-        })
-
+    setActiveUsers: (activeusers: Record<string, number>) => set({activeUsers: {...get().activeUsers,...activeusers}})
 }))

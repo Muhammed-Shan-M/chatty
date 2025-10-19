@@ -48,8 +48,7 @@ export const useGroupChatStore = create<GroupChatStore>((set,get) => ({
         const {socket, authUser} = useAuthStore.getState()
         const {selectedGroup} = useGroupStore.getState()
 
-        socket?.emit('join-group', groupId, authUser?._id)
-
+        socket?.emit('join-group', groupId, authUser?._id)        
 
         socket?.on('newGroupMessage',({newMessage, groupId}) => {
             if(newMessage.senderId._id !== authUser?._id && groupId ===  selectedGroup?._id){

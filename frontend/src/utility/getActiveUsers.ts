@@ -9,6 +9,6 @@ export function getActiveUsers(groups:IGroup[]) {
     const setActiveUsers = useGroupStore.getState().setActiveUsers
 
     socket?.emit('getActiveUsers',groupIds, (activeUser:Record<string,number>) => {
-        setActiveUsers(activeUser)
+        setActiveUsers(activeUser)        
     })
 }

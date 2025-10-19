@@ -28,12 +28,12 @@ export const ChatContainer = () => {
     )
     const { showGroupInfo, selectedGroup } = useGroupStore()
 
-    useEffect(() => {
+    useEffect(() => {        
         if (!selectedGroup) return
 
         getMessages(selectedGroup._id)
 
-        joinToGroup(selectedGroup?._id)
+        joinToGroup(selectedGroup?._id)        
 
         return () => leaveGroup(selectedGroup?._id)
 
