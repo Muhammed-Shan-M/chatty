@@ -66,7 +66,7 @@ export const Sidebar = React.memo(({ cbForModal }: { cbForModal: () => void }) =
 
 
     const filteredUsers = useMemo(() => {      
-        console.log('filtered users',users, onlineUsers);
+        // console.log('filtered users',users, onlineUsers);
           
         return showOnlineOnly
             ? users.filter((user) => onlineUsers.includes(user._id))
@@ -83,7 +83,7 @@ export const Sidebar = React.memo(({ cbForModal }: { cbForModal: () => void }) =
 
 
     const unreadMap = useMemo(() => {
-        console.log('unreadMap users');
+        // console.log('unreadMap users');
         
         return Object.fromEntries(
             unreadMessages.map((msg) => [msg._id, msg])
@@ -91,7 +91,7 @@ export const Sidebar = React.memo(({ cbForModal }: { cbForModal: () => void }) =
     }, [unreadMessages]);
 
     const unreadGroupMap = useMemo(() => {
-        console.log('unreadMap groups');
+        // console.log('unreadMap groups');
         
         return Object.fromEntries(
             groupUnreadMessage.map((msg) => [msg.groupId, msg])
@@ -116,7 +116,7 @@ export const Sidebar = React.memo(({ cbForModal }: { cbForModal: () => void }) =
             return acc 
         },[] as GroupWithoutPopulate[])
 
-        console.log('sorted useEffect');
+        // console.log('sorted useEffect');
         
 
         setSortedUsers(sortedUser)
@@ -128,19 +128,19 @@ export const Sidebar = React.memo(({ cbForModal }: { cbForModal: () => void }) =
         getUsers();
         fecthGroups()
 
-        console.log('get and feth users useeffect');
+        // console.log('get and feth users useeffect');
         
    }, []); // getUsers, fecthGroups
 
     useEffect(() => {
 
-        console.log('get Active users useeffect');
+        // console.log('get Active users useeffect');
         
         getActiveUsers(groups)        
     },[groups])
 
     useEffect(() => {
-        console.log("unread msg both g-p useEffect");
+        // console.log("unread msg both g-p useEffect");
         
         if (authUser) {
             fetchUnreadMessages(authUser?._id)
@@ -150,7 +150,7 @@ export const Sidebar = React.memo(({ cbForModal }: { cbForModal: () => void }) =
 
 
     useEffect(() => {
-        console.log('size captures useEffect');
+        // console.log('size captures useEffect');
         
         const mediaQuery = window.matchMedia('(min-width: 1024px)')
 

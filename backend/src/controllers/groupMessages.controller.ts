@@ -141,7 +141,6 @@ export const markAsReadUnreadCounts = async (req: Request, res: Response, next: 
 
     } catch (error) {
         console.log(error);
-        
         next(error)       
     }
 }

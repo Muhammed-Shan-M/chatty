@@ -19,16 +19,21 @@ import type { AuthStateType } from './types/userAuthStoreType'
 const App = () => {
   const theme = useThemeStore(state => state.theme)
 
-  const {authUser, checkAuth, isCheckingAuth} = useAuthStore(
+  const {authUser, checkAuth, isCheckingAuth, disconnect} = useAuthStore(
     useShallow((state:AuthStateType) => ({
       authUser: state.authUser,
       checkAuth: state.checkAuth,
-      isCheckingAuth: state.isCheckingAuth
+      isCheckingAuth: state.isCheckingAuth,
+      disconnect: state.disconnectSocket
     }))
   )
 
   useEffect(() => {
     checkAuth()
+
+    return () => {
+      disconnect()
+    }
   }, [checkAuth])
 
   if (isCheckingAuth && !authUser) {

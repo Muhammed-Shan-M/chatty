@@ -21,6 +21,8 @@ const emitter = new EventEmitter();
 
 const BASE_URL = import.meta.env.VITE_API_SOCKET_URL
 
+const attachedEvents:string[] = [];
+
 export const useAuthStore = create<AuthStateType>((set, get) => ({
     authUser: null,
     isSigninUP: false,
@@ -137,6 +139,7 @@ export const useAuthStore = create<AuthStateType>((set, get) => ({
                 userId: authUser?._id
             }
         })
+        // console.log('connect socket io runs');
 
         socket.connect()
 
@@ -154,12 +157,14 @@ export const useAuthStore = create<AuthStateType>((set, get) => ({
             set({ onlineUsers: userIds })
             // useChatStore.getState().getUsers()
         })
+        attachedEvents.push('getOnlineUsers')
 
         socket.on('signUP:newUserJoined',(userData:User) => {
             useChatStore.setState((state) => ({
                 users: [...state.users, userData]
             }))
         })
+        attachedEvents.push('signUP:newUserJoined')
 
 
         socket.on('notifyUser', async (notification) => {
@@ -198,12 +203,13 @@ export const useAuthStore = create<AuthStateType>((set, get) => ({
                 }
             }
             else if (selectedUser?._id !== notification.senderId) {
-
                 emitNotification(notification);
                 fetchUnreadMessages(authUser._id);
-
             }
+
+            
         });
+        attachedEvents.push('notifyUser')
 
 
         socket.on('groupNotification', ({groupId, preview,groupName,senderUserName}) => {
@@ -213,22 +219,34 @@ export const useAuthStore = create<AuthStateType>((set, get) => ({
 
             emitGroupNotification(preview, groupName, senderUserName)
         })
-
+        attachedEvents.push('groupNotification')
 
 
         socket.on('Group:updateUnreadMessage', (unreadMessage) => {
             useGroupChatStore.getState().setUnreadMessages(unreadMessage)
         })
+        attachedEvents.push('Group:updateUnreadMessage')
 
 
         socket.on('new-activeUser', (groupId:string, count: number) =>{
             useGroupStore.getState().setActiveUsers({[groupId]: count})
         })
+        attachedEvents.push('new-activeUser')
+
+
+        console.log(attachedEvents);
+        
     },
 
     // Todo : orginize the socket io event and emit
     disconnectSocket: async () => {
-        if (get().socket?.connect()) get().socket?.disconnect()
+        const socket = get().socket
+        if (socket?.connect()){
+            socket.removeAllListeners()  
+            socket.disconnect()
+            set({socket: null})
+        }
+
     }
 
 }))
