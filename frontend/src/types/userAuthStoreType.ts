@@ -13,6 +13,8 @@ export interface AuthStateType {
     onlineUsers: string[]
     socket: Socket | null
     showUserInfo: boolean
+    socketCleanUp: (() => void) | null
+    socketConnected: boolean
     setShowUserInfo:(val: boolean) => void
     checkAuth: () => Promise<void>
     signup: (data: Data) => Promise<void>
