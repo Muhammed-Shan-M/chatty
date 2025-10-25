@@ -16,6 +16,7 @@ import EventEmitter from 'eventemitter3';
 import { findChatId } from '@/utility/findChatId'
 import { useGroupChatStore } from './groupChatStore'
 import type { User } from '@/types/user'
+import { setupAllHandlers } from '@/socketHandlers'
 
 const emitter = new EventEmitter();
 
@@ -33,10 +34,13 @@ export const useAuthStore = create<AuthStateType>((set, get) => ({
     socket: null,
     showUserInfo: false,
 
+    socketCleanUp: null,
+    socketConnected: false,
+
     setShowUserInfo: (val) => {
         set({ showUserInfo: val })
 
-        if(emitter.listenerCount('read-unreadMsg') > 0){
+        if (emitter.listenerCount('read-unreadMsg') > 0) {
             emitter.emit('read-unreadMsg')
         }
     },
@@ -130,17 +134,17 @@ export const useAuthStore = create<AuthStateType>((set, get) => ({
 
     connectSocket: async () => {
         const { authUser } = get()
-        if (!authUser && get().socket?.connected) return
+        if (!authUser && get().socketConnected) return
 
         const socket = io(BASE_URL, {
             query: {
                 userId: authUser?._id
             }
         })
- 
+
         socket.connect()
 
-        set({ socket: socket })
+        set({ socket: socket, socketConnected: true })
 
         if ("Notification" in window) {
             if (Notification.permission === "default") {
@@ -150,85 +154,22 @@ export const useAuthStore = create<AuthStateType>((set, get) => ({
             }
         }
 
-        socket.on('getOnlineUsers', (userIds) => {
-            set({ onlineUsers: userIds })
-            // useChatStore.getState().getUsers()
-        })
-
-        socket.on('signUP:newUserJoined',(userData:User) => {
-            useChatStore.setState((state) => ({
-                users: [...state.users, userData]
-            }))
-        })
-
-
-        socket.on('notifyUser', async (notification) => {
-            const { selectedUser, fetchUnreadMessages } = useChatStore.getState();
-
-            if (!authUser) return;
-
-            if (selectedUser?._id === notification.senderId) {
-                try {
-                    if (get().showUserInfo) {
-                        emitNotification(notification);
-                        fetchUnreadMessages(authUser._id);
-
-                        const selectedId = selectedUser?._id
-
-                        emitter.on('read-unreadMsg',async () => {
-                            console.log('from the evernt : ', selectedId, useChatStore.getState().selectedUser?._id);
-                            if(!get().showUserInfo && selectedId === useChatStore.getState().selectedUser?._id){
-                                const res = await markAsRead(authUser._id, selectedUser?._id!);
-                                
-                                if(res.data.success){
-                                    const chatId = findChatId(get().authUser?._id!, selectedId!)
-                                    useChatStore.getState().setUnreadMessage(chatId)
-                                }
-                            }
-                        })
-
-                        return 
-                    }
-
-                    const res = await markAsRead(authUser._id, selectedUser?._id!);
-
-                    if (res.data.success) return;
-                } catch (err) {
-                    errorHandler(err)
-                }
-            }
-            else if (selectedUser?._id !== notification.senderId) {
-
-                emitNotification(notification);
-                fetchUnreadMessages(authUser._id);
-
-            }
+        const cleanup = setupAllHandlers(socket, {
+            auth: set,
+            chat: useChatStore.setState
         });
 
-
-        socket.on('groupNotification', ({groupId, preview,groupName,senderUserName}) => {
-            const {groups} = useGroupStore.getState()
-            const isGroupExist = groups.find(g => g._id === groupId)
-            if(!isGroupExist)return
-
-            emitGroupNotification(preview, groupName, senderUserName)
-        })
-
-
-
-        socket.on('Group:updateUnreadMessage', (unreadMessage) => {
-            useGroupChatStore.getState().setUnreadMessages(unreadMessage)
-        })
-
-
-        socket.on('new-activeUser', (groupId:string, count: number) =>{
-            useGroupStore.getState().setActiveUsers({[groupId]: count})
-        })
+        set({ socketCleanUp: cleanup })
     },
 
     // Todo : orginize the socket io event and emit
     disconnectSocket: async () => {
-        if (get().socket?.connect()) get().socket?.disconnect()
+        if (get().socket?.connect()) {
+            
+            get().socket?.disconnect()
+            const cleanup = get().socketCleanUp
+            if (cleanup) cleanup()
+        }
     }
 
 }))
