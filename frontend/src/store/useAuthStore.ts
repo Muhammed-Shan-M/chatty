@@ -137,7 +137,7 @@ export const useAuthStore = create<AuthStateType>((set, get) => ({
                 userId: authUser?._id
             }
         })
-
+ 
         socket.connect()
 
         set({ socket: socket })
