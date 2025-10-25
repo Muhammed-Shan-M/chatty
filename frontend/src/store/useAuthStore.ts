@@ -6,19 +6,12 @@ import { toast } from 'react-toastify'
 import { errorHandler } from '../utility/errorHandler'
 import type { LoginFormData } from '../types/loginFormData'
 import { io } from 'socket.io-client'
-import { emitNotification } from '../utility/emitNotification'
 import { useChatStore } from './chatStore'
-import { markAsRead } from '../utility/markAsRead'
-import { useGroupStore } from './group'
-import { emitGroupNotification } from '@/utility/emiteGroupNotification'
-
-import EventEmitter from 'eventemitter3';
-import { findChatId } from '@/utility/findChatId'
-import { useGroupChatStore } from './groupChatStore'
-import type { User } from '@/types/user'
 import { setupAllHandlers } from '@/socketHandlers'
+import EventEmitter from 'eventemitter3';
 
-const emitter = new EventEmitter();
+const emitter = new EventEmitter()
+
 
 const BASE_URL = import.meta.env.VITE_API_SOCKET_URL
 
