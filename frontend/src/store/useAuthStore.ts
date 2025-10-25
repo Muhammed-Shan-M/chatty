@@ -159,11 +159,11 @@ export const useAuthStore = create<AuthStateType>((set, get) => ({
         set({ socketCleanUp: cleanup })
     },
 
-    // Todo : orginize the socket io event and emit
     disconnectSocket: async () => {
-        if (get().socket?.connect()) {
-            
+        console.log('disconnect works')
+        if (get().socketConnected) {        
             get().socket?.disconnect()
+            set({socketConnected: false, socket: null})
             const cleanup = get().socketCleanUp
             if (cleanup) cleanup()
         }
