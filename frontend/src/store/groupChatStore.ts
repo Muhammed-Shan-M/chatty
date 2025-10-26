@@ -14,7 +14,6 @@ export const useGroupChatStore = create<GroupChatStore>((set,get) => ({
 
     unreadMessages:[],
 
-
     getMessages: async (groupId) => {
         set({isGroupMessageLoading: true})
         try {

@@ -160,7 +160,6 @@ export const useAuthStore = create<AuthStateType>((set, get) => ({
     },
 
     disconnectSocket: async () => {
-        console.log('disconnect works')
         if (get().socketConnected) {        
             get().socket?.disconnect()
             set({socketConnected: false, socket: null})

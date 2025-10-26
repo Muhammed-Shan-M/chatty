@@ -1,6 +1,6 @@
 
 
-import React from 'react';
+import React, { useCallback } from 'react';
 import { Users, ChevronsRight, Plus, ChevronDown } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { useChatStore } from '../../store/chatStore';
@@ -22,155 +22,273 @@ import { getActiveUsers } from '@/utility/getActiveUsers';
 
 
 export const Sidebar = React.memo(({ cbForModal }: { cbForModal: () => void }) => {
-    const { unreadMessages, fetchUnreadMessages, getUsers, users, isUsersLoading } = useChatStore(
-        useShallow((state: ChatStore) => ({
-            unreadMessages: state.unreadMessages,
-            fetchUnreadMessages: state.fetchUnreadMessages,
-            getUsers: state.getUsers,
-            users: state.users,
-            isUsersLoading: state.isUsersLoading,
-        }))
+    // const { unreadMessages, fetchUnreadMessages, getUsers, users, isUsersLoading } = useChatStore(
+    //     useShallow((state: ChatStore) => ({
+    //         unreadMessages: state.unreadMessages,
+    //         fetchUnreadMessages: state.fetchUnreadMessages,
+    //         getUsers: state.getUsers,
+    //         users: state.users,
+    //         isUsersLoading: state.isUsersLoading,
+    //     }))
+    // );
+
+    // const { onlineUsers, authUser, showUserInfo, setShowUserInfo } = useAuthStore(
+    //     useShallow((state: AuthStateType) => ({
+    //         onlineUsers: state.onlineUsers,
+    //         authUser: state.authUser,
+    //         showUserInfo: state.showUserInfo,
+    //         setShowUserInfo: state.setShowUserInfo
+    //     }))
+    // )
+
+    // const { groups, fecthGroups } = useGroupStore(
+    //     useShallow((state: GroupStore) => ({
+    //         groups: state.groups,
+    //         fecthGroups: state.fecthGroups
+    //     }))
+    // )
+
+    // const { fetchUnreadMessages: FetchGroupUnreadMessage, unreadMessages: groupUnreadMessage } = useGroupChatStore(
+    //     useShallow((state: GroupChatStore) => ({
+    //         fetchUnreadMessages: state.fetchUnreadMessages,
+    //         unreadMessages: state.unreadMessages
+    //     }))
+    // )
+
+
+
+    // const [showOnlineOnly, setShowOnlineOnly] = useState(false);
+    // const [sortedUsers, setSortedUsers] = useState<User[] | null>(null)
+    // const [showGroups, setShowGroups] = useState(true)
+    // const [sortedGroups, setSortedGroups] = useState<GroupWithoutPopulate[]>([])
+
+    // console.count("Sidebar render");
+    // // console.log("Sidebar render stack:");
+    // // console.trace();
+
+
+    // const filteredUsers = useMemo(() => {
+    //     // console.log('filtered users');
+
+    //     return showOnlineOnly
+    //         ? users.filter((user) => onlineUsers.includes(user._id))
+    //         : users.reduce((acc, user) => {
+    //             if (onlineUsers.includes(user._id)) {
+    //                 acc.unshift(user);
+    //             } else {
+    //                 acc.push(user);
+    //             }
+    //             return acc;
+    //         }, [] as User[]);
+    // }, [showOnlineOnly, users, onlineUsers]);
+
+
+    // const unreadMap = useMemo(() => {
+    //     // console.log('unreadMap users');
+
+    //     return Object.fromEntries(
+    //         unreadMessages.map((msg) => [msg._id, msg])
+    //     );
+    // }, [unreadMessages]);
+
+    // const unreadGroupMap = useMemo(() => {
+    //     // console.log('unreadMap groups');
+
+    //     return Object.fromEntries(
+    //         groupUnreadMessage.map((msg) => [msg.groupId, msg])
+    //     )
+    // }, [groupUnreadMessage])
+
+
+
+
+    // useEffect(() => {
+    //     const sortedUser = filteredUsers.reduce((acc, user) => {
+    //         if (unreadMap[user.chatId]) acc.unshift(user)
+    //         else acc.push(user)
+
+    //         return acc
+    //     }, [] as User[])
+
+    //     const sortedGroup = groups.reduce((acc, group) => {
+    //         if (unreadGroupMap[group._id]) acc.unshift(group)
+    //         else acc.push(group)
+
+    //         return acc
+    //     }, [] as GroupWithoutPopulate[])
+
+    //     // console.log('sorted useEffect');
+
+
+    //     setSortedUsers(sortedUser)
+    //     setSortedGroups(sortedGroup)
+    // }, [unreadMessages, filteredUsers])
+
+
+    // useEffect(() => {
+    //     getUsers();
+    //     fecthGroups()
+
+    //     // console.log('get and feth users useeffect');
+
+    // }, []); // getUsers, fecthGroups
+
+    // useEffect(() => {
+
+    //     // console.log('get Active users useeffect');
+
+    //     getActiveUsers(groups)
+    // }, [groups])
+
+    // useEffect(() => {
+    //     // console.log("unread msg both g-p useEffect");
+
+    //     if (authUser) {
+    //         fetchUnreadMessages(authUser?._id)
+    //         FetchGroupUnreadMessage(authUser._id)
+    //     }
+    // }, [authUser])// fetchUnreadMessages, FetchGroupUnreadMessage
+
+
+    // useEffect(() => {
+    //     // console.log('size captures useEffect');
+
+    //     const mediaQuery = window.matchMedia('(min-width: 1024px)')
+
+    //     if (mediaQuery.matches) {
+    //         setShowUserInfo(false)
+    //     }
+
+    //     const handler = (e: MediaQueryListEvent) => {
+    //         if (e.matches) {
+    //             setShowUserInfo(false)
+    //         }
+    //     }
+
+    //     mediaQuery.addEventListener('change', handler)
+    //     return () => mediaQuery.removeEventListener('change', handler)
+    // }, [])
+
+
+
+  // ✅ OPTIMIZATION 1: Split selectors to prevent unnecessary re-renders
+// Only re-render when THESE specific values change
+const users = useChatStore(useShallow((state: ChatStore) => state.users));
+const unreadMessages = useChatStore(useShallow((state: ChatStore) => state.unreadMessages));
+const isUsersLoading = useChatStore(useShallow((state: ChatStore) => state.isUsersLoading));
+
+// Functions are stable, select them separately
+const { fetchUnreadMessages, getUsers } = useChatStore(
+    useShallow((state: ChatStore) => ({
+        fetchUnreadMessages: state.fetchUnreadMessages,
+        getUsers: state.getUsers,
+    }))
+);
+
+const onlineUsers = useAuthStore(useShallow((state: AuthStateType) => state.onlineUsers));
+const authUser = useAuthStore(useShallow((state: AuthStateType) => state.authUser));
+const showUserInfo = useAuthStore(useShallow((state: AuthStateType) => state.showUserInfo));
+const setShowUserInfo = useAuthStore(useShallow((state: AuthStateType) => state.setShowUserInfo));
+
+const groups = useGroupStore(useShallow((state: GroupStore) => state.groups));
+const fecthGroups = useGroupStore(useShallow((state: GroupStore) => state.fecthGroups));
+
+const groupUnreadMessage = useGroupChatStore(useShallow((state: GroupChatStore) => state.unreadMessages));
+const FetchGroupUnreadMessage = useGroupChatStore(useShallow((state: GroupChatStore) => state.fetchUnreadMessages));
+
+const [showOnlineOnly, setShowOnlineOnly] = useState(false);
+const [showGroups, setShowGroups] = useState(true)
+
+console.count('rerender side bar')
+
+// ✅ FIX 1: Memoize getActiveUsers to prevent recreation every render
+const getActiveUsersStable = useCallback((groups: GroupWithoutPopulate[]) => {
+    getActiveUsers(groups)
+}, []) // Assuming getActiveUsers is stable
+
+// ✅ FIX 2: Create stable reference for authUser._id
+const authUserId = useMemo(() => authUser?._id, [authUser?._id]);
+
+const filteredUsers = useMemo(() => {
+    return showOnlineOnly
+        ? users.filter((user) => onlineUsers.includes(user._id))
+        : users.reduce((acc, user) => {
+            if (onlineUsers.includes(user._id)) {
+                acc.unshift(user);
+            } else {
+                acc.push(user);
+            }
+            return acc;
+        }, [] as User[]);
+}, [showOnlineOnly, users, onlineUsers]);
+
+const unreadMap = useMemo(() => {
+    return Object.fromEntries(
+        unreadMessages.map((msg) => [msg._id, msg])
     );
+}, [unreadMessages]);
 
-    const { onlineUsers, authUser, showUserInfo, setShowUserInfo } = useAuthStore(
-        useShallow((state: AuthStateType) => ({
-            onlineUsers: state.onlineUsers,
-            authUser: state.authUser,
-            showUserInfo: state.showUserInfo,
-            setShowUserInfo: state.setShowUserInfo
-        }))
+const unreadGroupMap = useMemo(() => {
+    return Object.fromEntries(
+        groupUnreadMessage.map((msg) => [msg.groupId, msg])
     )
+}, [groupUnreadMessage])
 
-    const { groups, fecthGroups } = useGroupStore(
-        useShallow((state: GroupStore) => ({
-            groups: state.groups,
-            fecthGroups: state.fecthGroups
-        }))
-    )
+// ✅ FIX 3: Combined sorting logic into ONE useMemo instead of useEffect
+// This prevents unnecessary state updates that trigger re-renders
+const { sortedUsers, sortedGroups } = useMemo(() => {
+    const sortedUser = filteredUsers.reduce((acc, user) => {
+        if (unreadMap[user.chatId]) acc.unshift(user)
+        else acc.push(user)
+        return acc
+    }, [] as User[])
 
-    const {fetchUnreadMessages: FetchGroupUnreadMessage, unreadMessages: groupUnreadMessage} = useGroupChatStore(
-        useShallow((state: GroupChatStore) => ({
-            fetchUnreadMessages: state.fetchUnreadMessages,
-            unreadMessages: state.unreadMessages
-        }))
-    )
+    const sortedGroup = groups.reduce((acc, group) => {
+        if (unreadGroupMap[group._id]) acc.unshift(group)
+        else acc.push(group)
+        return acc
+    }, [] as GroupWithoutPopulate[])
 
+    return { sortedUsers: sortedUser, sortedGroups: sortedGroup }
+}, [filteredUsers, unreadMap, groups, unreadGroupMap]);
 
+// ✅ FIX 4: Added dependency array with stable references
+useEffect(() => {
+    getUsers();
+    fecthGroups()
+}, [getUsers, fecthGroups])
 
-    const [showOnlineOnly, setShowOnlineOnly] = useState(false);
-    const [sortedUsers, setSortedUsers] = useState<User[] | null>(null)
-    const [showGroups, setShowGroups] = useState(true)
-    const [sortedGroups, setSortedGroups] = useState<GroupWithoutPopulate[]>([])
+// ✅ FIX 5: Use memoized callback
+useEffect(() => {
+    getActiveUsersStable(groups)
+}, [groups, getActiveUsersStable])
 
+// ✅ FIX 6: Use stable authUserId reference to prevent unnecessary calls
+useEffect(() => {
+    if (authUserId) {
+        fetchUnreadMessages(authUserId)
+        FetchGroupUnreadMessage(authUserId)
+    }
+}, [authUserId, fetchUnreadMessages, FetchGroupUnreadMessage])
 
+// ✅ FIX 7: This one is fine, no changes needed
+useEffect(() => {
+    const mediaQuery = window.matchMedia('(min-width: 1024px)')
 
+    if (mediaQuery.matches) {
+        setShowUserInfo(false)
+    }
 
-    const filteredUsers = useMemo(() => {      
-        // console.log('filtered users',users, onlineUsers);
-          
-        return showOnlineOnly
-            ? users.filter((user) => onlineUsers.includes(user._id))
-            : users.reduce((acc, user) => {
-                if (onlineUsers.includes(user._id)) {
-                    acc.unshift(user);
-                } else {
-                    acc.push(user);
-                }
-                return acc;
-            }, [] as User[]);
-    }, [showOnlineOnly, users, onlineUsers]);
-
-
-
-    const unreadMap = useMemo(() => {
-        // console.log('unreadMap users');
-        
-        return Object.fromEntries(
-            unreadMessages.map((msg) => [msg._id, msg])
-        );
-    }, [unreadMessages]);
-
-    const unreadGroupMap = useMemo(() => {
-        // console.log('unreadMap groups');
-        
-        return Object.fromEntries(
-            groupUnreadMessage.map((msg) => [msg.groupId, msg])
-        ) 
-    }, [groupUnreadMessage])
-
-    
-    
-
-    useEffect(() => {
-        const sortedUser = filteredUsers.reduce((acc, user) => {
-            if (unreadMap[user.chatId]) acc.unshift(user)
-            else acc.push(user)
-
-            return acc
-        }, [] as User[])
-
-        const sortedGroup = groups.reduce((acc, group) => {
-            if(unreadGroupMap[group._id]) acc.unshift(group)
-            else acc.push(group)
-
-            return acc 
-        },[] as GroupWithoutPopulate[])
-
-        // console.log('sorted useEffect');
-        
-
-        setSortedUsers(sortedUser)
-        setSortedGroups(sortedGroup)
-    }, [unreadMessages, filteredUsers])
-
-
-    useEffect(() => {
-        getUsers();
-        fecthGroups()
-
-        // console.log('get and feth users useeffect');
-        
-   }, []); // getUsers, fecthGroups
-
-    useEffect(() => {
-
-        // console.log('get Active users useeffect');
-        
-        getActiveUsers(groups)        
-    },[groups])
-
-    useEffect(() => {
-        // console.log("unread msg both g-p useEffect");
-        
-        if (authUser) {
-            fetchUnreadMessages(authUser?._id)
-            FetchGroupUnreadMessage(authUser._id)
-        }
-    }, [authUser])// fetchUnreadMessages, FetchGroupUnreadMessage
-
-
-    useEffect(() => {
-        // console.log('size captures useEffect');
-        
-        const mediaQuery = window.matchMedia('(min-width: 1024px)')
-
-        if (mediaQuery.matches) {
+    const handler = (e: MediaQueryListEvent) => {
+        if (e.matches) {
             setShowUserInfo(false)
         }
+    }
 
-        const handler = (e: MediaQueryListEvent) => {
-            if (e.matches) {
-                setShowUserInfo(false)
-            }
-        }
+    mediaQuery.addEventListener('change', handler)
+    return () => mediaQuery.removeEventListener('change', handler)
+}, [setShowUserInfo])
 
-        mediaQuery.addEventListener('change', handler)
-        return () => mediaQuery.removeEventListener('change', handler)
-    }, [])
-
-    // console.log('Sidebar render ');
-    
-  
     if (isUsersLoading) return <SidebarSkeleton />;
 
     // Todo : somany rerenders when a new user logins

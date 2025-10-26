@@ -22,6 +22,7 @@ export const Home = React.memo(() => {
       isGroupChat: state.isGroupChat
     }))
   )
+  
 
   const [isCreateGroupModalOpen, setIsCreateGroupModalOpen] = useState(false)
 
