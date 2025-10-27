@@ -21,6 +21,8 @@ export const useChatStore = create<ChatStore>((set, get) => ({
     getUsers: async () => {
         set({ isUsersLoading: true })
         try {
+            console.log('get user runs');
+            
             const res = await axiosInstance.get('/messages/users')
             set({ users: res.data })
         } catch (error) {
@@ -124,6 +126,8 @@ export const useChatStore = create<ChatStore>((set, get) => ({
 
     fetchUnreadMessages: async (userId) => {
         try {
+            console.log('unread message runs');
+            
             const res = await axiosInstance.get(`/messages/unread-messages/${userId}`)
             set({ unreadMessages: res.data })
         } catch (error) {

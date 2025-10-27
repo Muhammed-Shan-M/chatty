@@ -7,10 +7,6 @@ export const getOnlineUsers = (socket:Socket, set:SetState<AuthStateType> ) => {
     set({onlineUsers: userIds})
   };
 
-
-  console.count('from getOnline users')
-  
-
   socket.on('getOnlineUsers', handleGetOnlineUsers);
 
   return () => {
